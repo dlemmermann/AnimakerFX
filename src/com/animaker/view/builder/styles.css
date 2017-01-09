@@ -1,0 +1,113 @@
+.root {
+    -fx-base: rgba(60, 63, 65, 255);
+    -fx-font-family: Arial;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-font-smoothing-type: lcd;
+    -fx-focus-color: derive(-emphasize, 40%);
+    -emphasize: rgba(69, 78, 95, 1);
+}
+
+.split-pane-divider {
+    -fx-background-color: -fx-base;
+    -fx-border-color: black;
+}
+
+.split-pane:vertical .split-pane-divider {
+    -fx-border-width: .5 0 .5 0;
+}
+
+.split-pane:horizontal .split-pane-divider {
+    -fx-border-width: 0 .5 0 .5;
+}
+
+.list-cell:odd,
+.list-cell:even {
+    -fx-border-width: 0 0 0 5;
+    -fx-border-color: transparent;
+    -fx-background-color: -fx-base;
+    -fx-text-fill: -fx-light-text-color;
+}
+
+.list-cell .textfield {
+    -fx-background-color: transparent;
+}
+
+.list-cell:selected {
+    -fx-border-color: burlywood;
+    -fx-border-width: 0 0 0 5;
+}
+
+.property-sheet .viewport, .property-pane {
+    -fx-background-color: -fx-base;
+}
+
+.tab-header-area {
+    -fx-padding: 0;
+}
+
+.tab-header-background {
+    -fx-padding: 0;
+    -fx-background-color: -emphasize;
+}
+
+.headers-region {
+    -fx-padding: 0;
+    -fx-spacing: 0;
+}
+
+.tab {
+    -fx-padding: 2 10 2 10;
+    -fx-font-size: 1em;
+    -fx-background-color: transparent;
+    -fx-background-radius: 0;
+    -fx-border-insets: 0, 1;
+    -fx-border-color: transparent rgba(0, 0, 0, .1) transparent transparent, transparent rgba(255, 255, 255, .1) transparent transparent;
+}
+
+.tab:selected {
+    -fx-background-color: rgba(255, 255, 255, .2);
+}
+
+.tab .text {
+    -fx-fill: white;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.6), 5, 0.0, 0, 1);
+}
+
+.palette-title {
+    -fx-padding: 6 10 6 10;
+    -fx-alignment: center;
+    -fx-font-size: 1em;
+    -fx-background-color: -emphasize;
+}
+
+.palette-title .text {
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.6), 5, 0.0, 0, 1);
+}
+
+.list-view {
+    -fx-padding: 0;
+}
+
+.tool-bar {
+    -fx-background-color: -fx-base;
+}
+
+.menu-bar {
+    -fx-background-color: -fx-base;
+}
+
+.scroll-bar .thumb {
+    -fx-background-color: derive(-fx-base, -30%);
+    -fx-background-radius: 0;
+    -fx-border-color: derive(-fx-base, -60%);
+    -fx-border-radius: 0;
+}
+
+.slider {
+    -fx-border-color: cyan;
+}
+
+.slider:focused {
+    -fx-border-color: red;
+}
