@@ -1,9 +1,9 @@
 package com.animaker.view.builder;
 
 import com.animaker.model.Layer;
+import com.animaker.model.Presentation;
 import com.animaker.model.Slide;
-import com.animaker.model.Slider;
-import com.animaker.view.skins.builder.SliderBuilderViewSkin;
+import com.animaker.view.skins.builder.AnimakerViewSkin;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.control.Control;
@@ -12,29 +12,29 @@ import javafx.scene.control.Skin;
 /**
  * Created by lemmi on 19.12.16.
  */
-public class SliderBuilderView extends Control {
+public class AnimakerView extends Control {
 
-    public SliderBuilderView() {
-        getStylesheets().add(SliderBuilderView.class.getResource("styles.css").toExternalForm());
+    public AnimakerView() {
+        getStylesheets().add(AnimakerView.class.getResource("styles.css").toExternalForm());
     }
 
     @Override
     protected Skin<?> createDefaultSkin() {
-        return new SliderBuilderViewSkin(this);
+        return new AnimakerViewSkin(this);
     }
 
-    private final ObjectProperty<Slider> slider = new SimpleObjectProperty<>(this, "slider");
+    private final ObjectProperty<Presentation> presentation = new SimpleObjectProperty<>(this, "presentation");
 
-    public final ObjectProperty<Slider> sliderProperty() {
-        return slider;
+    public final ObjectProperty<Presentation> presentationProperty() {
+        return presentation;
     }
 
-    public final void setSlider(Slider slider) {
-        this.slider.set(slider);
+    public final void setPresentation(Presentation presentation) {
+        this.presentation.set(presentation);
     }
 
-    public final Slider getSlider() {
-        return slider.get();
+    public final Presentation getPresentation() {
+        return presentation.get();
     }
 
     // selected slide support

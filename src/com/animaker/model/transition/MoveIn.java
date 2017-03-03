@@ -86,7 +86,7 @@ public class MoveIn extends Transition {
             case RIGHT_TO_LEFT:
             case TOP_RIGHT_TO_BOTTOM_LEFT:
             case BOTTOM_RIGHT_TO_TOP_LEFT:
-                return view.getSliderView().getWidth();
+                return view.getPresentationView().getWidth();
             case BOTTOM_TO_TOP:
             case TOP_TO_BOTTOM:
             default:
@@ -103,7 +103,7 @@ public class MoveIn extends Transition {
             case BOTTOM_LEFT_TO_TOP_RIGHT:
             case BOTTOM_RIGHT_TO_TOP_LEFT:
             case BOTTOM_TO_TOP:
-                return view.getSliderView().getHeight();
+                return view.getPresentationView().getHeight();
             case LEFT_TO_RIGHT:
             case RIGHT_TO_LEFT:
             default:

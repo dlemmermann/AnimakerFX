@@ -1,12 +1,13 @@
 package com.animaker.view.skins.builder;
 
 import com.animaker.model.Layer;
+import com.animaker.model.Presentation;
 import com.animaker.model.Slide;
-import com.animaker.model.Slider;
-import com.animaker.view.SliderView;
+import com.animaker.view.PresentationView;
+import com.animaker.view.PresentationView.Status;
 import com.animaker.view.builder.LayerSettingsView;
 import com.animaker.view.builder.LayersPaletteView;
-import com.animaker.view.builder.SliderBuilderView;
+import com.animaker.view.builder.AnimakerView;
 import com.animaker.view.builder.SlidesPaletteView;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
@@ -34,15 +35,16 @@ import java.io.File;
 /**
  * Created by lemmi on 19.12.16.
  */
-public class SliderBuilderViewSkin extends SkinBase<SliderBuilderView> {
+public class AnimakerViewSkin extends SkinBase<AnimakerView> {
 
     private final PropertySheet propertySheet;
     private SlidesPaletteView slidesPaletteView;
     private LayersPaletteView layersPaletteView;
-    private SliderView sliderView;
+    private PresentationView presentationView;
     private MasterDetailPane centerPane;
+    private Button playSlide;
 
-    public SliderBuilderViewSkin(SliderBuilderView view) {
+    public AnimakerViewSkin(AnimakerView view) {
         super(view);
 
         MenuBar menuBar = createMenuBar();
@@ -90,7 +92,7 @@ public class SliderBuilderViewSkin extends SkinBase<SliderBuilderView> {
 
         getChildren().add(vbox);
 
-        slidesPaletteView.sliderProperty().bind(view.sliderProperty());
+        slidesPaletteView.presentationProperty().bind(view.presentationProperty());
         layersPaletteView.slideProperty().bind(slidesPaletteView.selectedSlideProperty());
 
         Bindings.bindBidirectional(slidesPaletteView.selectedSlideProperty(), view.selectedSlideProperty());
@@ -146,15 +148,32 @@ public class SliderBuilderViewSkin extends SkinBase<SliderBuilderView> {
         addSlide.setOnAction(evt -> addSlide());
         bar.getItems().add(addSlide);
 
+        // play slide
+        playSlide = new Button("Play");
+        playSlide.setOnAction(evt -> {
+            if (playSlide.getText().equals("Pause")) {
+                pauseSlide();
+            } else {
+                playSlide();
+            }
+        });
+
+        bar.getItems().add(playSlide);
+
+        // stop slide
+        Button stopSlide = new Button("Stop");
+        stopSlide.setOnAction(evt -> stop());
+        bar.getItems().add(stopSlide);
+
         return bar;
     }
 
     private void saveSlider() {
         try {
-            JAXBContext ctx = JAXBContext.newInstance(Slider.class);
+            JAXBContext ctx = JAXBContext.newInstance(Presentation.class);
             Marshaller marshaller = ctx.createMarshaller();
             marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-            marshaller.marshal(getSkinnable().getSlider(), new File(System.getProperty("user.home"), "SliderFX.xml"));
+            marshaller.marshal(getSkinnable().getPresentation(), new File(System.getProperty("user.home"), "SliderFX.xml"));
         } catch (JAXBException e) {
             e.printStackTrace();
         }
@@ -162,10 +181,10 @@ public class SliderBuilderViewSkin extends SkinBase<SliderBuilderView> {
 
     private void loadSlider() {
         try {
-            JAXBContext ctx = JAXBContext.newInstance(Slider.class);
+            JAXBContext ctx = JAXBContext.newInstance(Presentation.class);
             Unmarshaller unmarshaller = ctx.createUnmarshaller();
-            Slider slider = (Slider) unmarshaller.unmarshal(new File(System.getProperty("user.home"), "SliderFX.xml"));
-            getSkinnable().setSlider(slider);
+            Presentation presentation = (Presentation) unmarshaller.unmarshal(new File(System.getProperty("user.home"), "SliderFX.xml"));
+            getSkinnable().setPresentation(presentation);
         } catch (JAXBException e) {
             e.printStackTrace();
         }
@@ -174,38 +193,64 @@ public class SliderBuilderViewSkin extends SkinBase<SliderBuilderView> {
     private void addSlide() {
         TextInputDialog dialog = new TextInputDialog();
         dialog.setTitle("Add Slide");
-        dialog.setHeaderText("Add a new slide to the current slider.");
-        dialog.setContentText("Slider Name:");
+        dialog.setHeaderText("Add a new slide to the current presentation.");
+        dialog.setContentText("Presentation Name:");
         dialog.showAndWait().ifPresent(name -> {
             Slide slide = new Slide(name);
-            getSkinnable().getSlider().getSlides().add(slide);
+            getSkinnable().getPresentation().getSlides().add(slide);
             getSkinnable().setSelectedSlide(slide);
         });
     }
 
+    private void playSlide() {
+        presentationView.setStatus(Status.PLAY);
+    }
+
+    private void pauseSlide() {
+        presentationView.setStatus(Status.PAUSED);
+    }
+
+    private void stop() {
+        presentationView.setStatus(Status.STOPPED);
+    }
+
     private void updateSlide() {
-        if (sliderView != null) {
-            Bindings.unbindBidirectional(sliderView.currentSlideProperty(), getSkinnable().selectedSlideProperty());
+        if (presentationView != null) {
+            Bindings.unbindBidirectional(presentationView.currentSlideProperty(), getSkinnable().selectedSlideProperty());
         }
 
-        Slider slider = getSkinnable().getSlider();
-        sliderView = new SliderView(slider);
-        sliderView.addEventFilter(MouseEvent.MOUSE_CLICKED,
-                evt -> propertySheet.getItems().setAll(BeanPropertyUtils.getProperties(getSkinnable().getSlider())));
-        Bindings.bindBidirectional(sliderView.currentSlideProperty(), getSkinnable().selectedSlideProperty());
+        Presentation presentation = getSkinnable().getPresentation();
+        presentationView = new PresentationView(presentation);
+        presentationView.addEventFilter(MouseEvent.MOUSE_CLICKED,
+                evt -> propertySheet.getItems().setAll(BeanPropertyUtils.getProperties(getSkinnable().getPresentation())));
+        Bindings.bindBidirectional(presentationView.currentSlideProperty(), getSkinnable().selectedSlideProperty());
 
-        switch (slider.getLayout()) {
+        presentationView.statusProperty().addListener(it -> {
+            switch (presentationView.getStatus()) {
+                case PLAY:
+                    playSlide.setText("Pause");
+                    break;
+                case PAUSED:
+                    playSlide.setText("Resume");
+                    break;
+                case STOPPED:
+                    playSlide.setText("Play");
+                    break;
+            }
+        });
+
+        switch (presentation.getLayout()) {
             case FILL:
-                BorderPane.setAlignment(sliderView, Pos.CENTER);
-                centerPane.setMasterNode(sliderView);
+                BorderPane.setAlignment(presentationView, Pos.CENTER);
+                centerPane.setMasterNode(presentationView);
                 break;
             case FIXED_HEIGHT:
             case FIXED_WIDTH:
             case FIXED_SIZE:
                 StackPane content = new StackPane();
-                content.getChildren().add(sliderView);
-                StackPane.setAlignment(sliderView, Pos.CENTER);
-                sliderView.setEffect(new DropShadow(20, Color.BLACK));
+                content.getChildren().add(presentationView);
+                StackPane.setAlignment(presentationView, Pos.CENTER);
+                presentationView.setEffect(new DropShadow(20, Color.BLACK));
                 ScrollPane scrollPane = new ScrollPane(content);
                 scrollPane.setFitToHeight(true);
                 scrollPane.setFitToWidth(true);

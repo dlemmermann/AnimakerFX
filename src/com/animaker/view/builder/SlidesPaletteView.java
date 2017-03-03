@@ -1,7 +1,7 @@
 package com.animaker.view.builder;
 
+import com.animaker.model.Presentation;
 import com.animaker.model.Slide;
-import com.animaker.model.Slider;
 import com.animaker.view.skins.builder.SlidesPaletteViewSkin;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -18,20 +18,20 @@ public class SlidesPaletteView extends Control {
         return new SlidesPaletteViewSkin(this);
     }
 
-    // slider support
+    // presentation support
 
-    private final ObjectProperty<Slider> slider = new SimpleObjectProperty<>(this, "slider");
+    private final ObjectProperty<Presentation> presentation = new SimpleObjectProperty<>(this, "presentation");
 
-    public final ObjectProperty<Slider> sliderProperty() {
-        return slider;
+    public final ObjectProperty<Presentation> presentationProperty() {
+        return presentation;
     }
 
-    public final Slider getSlider() {
-        return slider.get();
+    public final Presentation getPresentation() {
+        return presentation.get();
     }
 
-    public final void setSlider(Slider slider) {
-        this.slider.set(slider);
+    public final void setPresentation(Presentation presentation) {
+        this.presentation.set(presentation);
     }
 
     // selected slide support

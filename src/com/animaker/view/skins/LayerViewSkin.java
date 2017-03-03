@@ -2,7 +2,11 @@ package com.animaker.view.skins;
 
 import com.animaker.model.Layer;
 import com.animaker.view.LayerView;
+import com.animaker.view.PresentationView;
+import javafx.animation.Animation.Status;
 import javafx.beans.binding.Bindings;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.SkinBase;
@@ -61,35 +65,50 @@ public class LayerViewSkin extends SkinBase<LayerView> {
                 break;
         }
 
-        stackPane.getChildren().add(node);
+        if (node != null) {
+            stackPane.getChildren().add(node);
+        }
     }
 
     private Node buildViewVideo() {
-        Media media = new Media(layer.getVideoContent());
-        MediaPlayer player = new MediaPlayer(media);
-        MediaView view = new MediaView(player);
-        view.preserveRatioProperty().bind(layer.preserveRatioProperty());
-        view.sceneProperty().addListener(it -> {
-            if (view.getScene() != null && layer.isVisible()) {
-                final Duration totalDuration = player.getTotalDuration();
-                player.play();
-                player.seek(totalDuration.divide(2));
-                player.pause();
-            }
-        });
+        final String videoContent = layer.getVideoContent();
+        if (videoContent != null) {
+            Media media = new Media(videoContent);
+            MediaPlayer player = new MediaPlayer(media);
+            MediaView view = new MediaView(player);
+            view.preserveRatioProperty().bind(layer.preserveRatioProperty());
+            getSkinnable().playProperty().addListener(it -> {
+                if (getSkinnable().isPlay()) {
+                    player.play();
+                } else {
+                    player.stop();
+                }
+            });
 
-        layer.visibleProperty().addListener(it -> {
-            if (layer.isVisible()) {
-                player.play();
-            } else {
-                player.pause();
-            }
-        });
+            PresentationView presentationView = getSkinnable().getSlideView().getPresentationView();
+            presentationView.statusProperty().addListener(it -> {
+                switch (presentationView.getStatus()) {
+                    case PAUSED:
+                        player.pause();
+                        break;
+                    case PLAY:
+                        if (player.getStatus().equals(MediaPlayer.Status.PAUSED)) {
+                            player.play();
+                        }
+                        break;
+                    case STOPPED:
+                        player.stop();
+                        break;
+                }
+            });
 
-        view.fitHeightProperty().bind(stackPane.heightProperty());
-        view.fitWidthProperty().bind(stackPane.widthProperty());
+            view.fitHeightProperty().bind(stackPane.heightProperty());
+            view.fitWidthProperty().bind(stackPane.widthProperty());
 
-        return view;
+            return view;
+        }
+
+        return null;
     }
 
     private Node buildViewWeb() {

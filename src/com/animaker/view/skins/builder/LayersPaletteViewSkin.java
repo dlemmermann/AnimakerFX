@@ -5,10 +5,12 @@ import com.animaker.model.Slide;
 import com.animaker.view.builder.LayersPaletteView;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
+import de.jensd.fx.glyphs.fontawesome.utils.FontAwesomeIconFactory;
 import javafx.beans.InvalidationListener;
 import javafx.beans.WeakInvalidationListener;
 import javafx.beans.binding.Bindings;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
@@ -31,8 +33,9 @@ public class LayersPaletteViewSkin extends SkinBase<LayersPaletteView> {
         hbox.setFillHeight(true);
         hbox.setAlignment(Pos.CENTER_LEFT);
 
-        FontAwesomeIconView plusIcon = new FontAwesomeIconView(FontAwesomeIcon.PLUS);
-        plusIcon.setGlyphSize(16);
+        Node plusIcon = FontAwesomeIconFactory.get().createIcon(FontAwesomeIcon.PLUS);
+        plusIcon.getStyleClass().add("palette-button");
+
         Button addLayerButton = new Button();
         addLayerButton.setOnAction(evt -> {
             Slide slide = view.getSlide();
@@ -81,7 +84,8 @@ public class LayersPaletteViewSkin extends SkinBase<LayersPaletteView> {
         private TextField nameField = new TextField();
 
         public LayerCell() {
-            FontAwesomeIconView eyeIcon = new FontAwesomeIconView(FontAwesomeIcon.EYE);
+            Node eyeIcon = FontAwesomeIconFactory.get().createIcon(FontAwesomeIcon.EYE);
+            eyeIcon.getStyleClass().add("layer-button");
 
             visibleButton.setGraphic(eyeIcon);
 
@@ -128,46 +132,51 @@ public class LayersPaletteViewSkin extends SkinBase<LayersPaletteView> {
 
         private WeakInvalidationListener weakLockChangeListener = new WeakInvalidationListener(lockChangeListener);
 
-        private FontAwesomeIconView getTypeIcon(Layer layer) {
-            FontAwesomeIconView view = null;
+        private Node getTypeIcon(Layer layer) {
+            Node view = null;
 
             if (layer != null) {
                 switch (layer.getType()) {
                     case CODE:
-                        view = new FontAwesomeIconView(FontAwesomeIcon.GEARS);
+                        view = FontAwesomeIconFactory.get().createIcon(FontAwesomeIcon.GEARS);
                         break;
                     case TEXT:
-                        view = new FontAwesomeIconView(FontAwesomeIcon.FONT);
+                        view = FontAwesomeIconFactory.get().createIcon(FontAwesomeIcon.FONT);
                         break;
                     case FXML:
-                        view = new FontAwesomeIconView(FontAwesomeIcon.CODE);
+                        view = FontAwesomeIconFactory.get().createIcon(FontAwesomeIcon.CODE);
                         break;
                     case IMAGE:
-                        view = new FontAwesomeIconView(FontAwesomeIcon.IMAGE);
+                        view = FontAwesomeIconFactory.get().createIcon(FontAwesomeIcon.IMAGE);
                         break;
                     case VIDEO:
-                        view = new FontAwesomeIconView(FontAwesomeIcon.VIDEO_CAMERA);
+                        view = FontAwesomeIconFactory.get().createIcon(FontAwesomeIcon.VIDEO_CAMERA);
                         break;
                     case HTML:
-                        view = new FontAwesomeIconView(FontAwesomeIcon.HTML5);
+                        view = FontAwesomeIconFactory.get().createIcon(FontAwesomeIcon.HTML5);
                         break;
                     default:
                         throw new IllegalArgumentException("unsupported layer type: " + layer.getType());
                 }
+
+                view.getStyleClass().add("layer-button");
             }
+
 
             return view;
         }
 
-        private FontAwesomeIconView getLockIcon(Layer layer) {
-            FontAwesomeIconView view = null;
+        private Node getLockIcon(Layer layer) {
+            Node view = null;
 
             if (layer != null) {
                 if (layer.isLocked()) {
-                    view = new FontAwesomeIconView(FontAwesomeIcon.LOCK);
+                    view = FontAwesomeIconFactory.get().createIcon(FontAwesomeIcon.LOCK);
                 } else {
-                    view = new FontAwesomeIconView(FontAwesomeIcon.UNLOCK_ALT);
+                    view = FontAwesomeIconFactory.get().createIcon(FontAwesomeIcon.UNLOCK_ALT);
                 }
+
+                view.getStyleClass().add("layer-button");
             }
 
             return view;

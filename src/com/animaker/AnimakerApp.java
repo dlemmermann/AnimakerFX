@@ -1,10 +1,10 @@
 package com.animaker;
 
 import com.animaker.model.Layer;
+import com.animaker.model.Presentation;
 import com.animaker.model.Slide;
-import com.animaker.model.Slider;
 import com.animaker.model.transition.*;
-import com.animaker.view.builder.SliderBuilderView;
+import com.animaker.view.builder.AnimakerView;
 import javafx.animation.Interpolator;
 import javafx.application.Application;
 import javafx.scene.Scene;
@@ -15,39 +15,41 @@ import javafx.util.Duration;
 /**
  * Created by lemmi on 19.12.16.
  */
-public class SliderApp extends Application {
+public class AnimakerApp extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        SliderBuilderView view = new SliderBuilderView();
+        AnimakerView view = new AnimakerView();
 
-        Slider slider = new Slider("My Slider");
-        slider.setLayout(Slider.SliderLayout.FIXED_SIZE);
-        slider.setWidth(960);
-        slider.setHeight(540);
-        slider.getStylesheets().add(SliderApp.class.getResource("demo.css").toExternalForm());
+        Presentation presentation = new Presentation("My Presentation");
+        presentation.setLayout(Presentation.SliderLayout.FIXED_SIZE);
+        presentation.setWidth(960);
+        presentation.setHeight(540);
+        presentation.getStylesheets().add(AnimakerApp.class.getResource("demo.css").toExternalForm());
 
-//        slider.setBackgroundImage(new Image(getClass().getResource("texture.jpg").toExternalForm()));
+//        presentation.setBackgroundImage(new Image(getClass().getResource("texture.jpg").toExternalForm()));
 
         // slide 1 - video
         Slide slide1 = new Slide("Big Buck Bunny");
         Layer videoLayer = new Layer("Media Player");
         videoLayer.setType(Layer.LayerType.VIDEO);
-        videoLayer.setVideoContent("file:///Users/lemmi/Desktop/BigBuckBunny_320x180.mp4");
+//        videoLayer.setVideoContent("file:///Users/lemmi/Desktop/bunny.mp4");
+        videoLayer.setVideoContent("file:///Users/lemmi/Desktop/slow-motion.mp4");
         slide1.getLayers().setAll(videoLayer);
+        videoLayer.getOpeningTransitions().add(new Play());
 
         // slide 2 - web
         Slide slide2 = new Slide("You Tube");
         Layer htmlLayer = new Layer("HTML Web View");
         htmlLayer.setType(Layer.LayerType.HTML);
-        htmlLayer.setHtmlContent(SliderApp.class.getResource("youtube.html").toExternalForm());
+        htmlLayer.setHtmlContent(AnimakerApp.class.getResource("youtube.html").toExternalForm());
         slide2.getLayers().setAll(htmlLayer);
 
         // slide 3 - image layer and text layer
         Slide slide3 = new Slide("Image and Text");
         Layer imageLayer = new Layer("Background");
         imageLayer.setType(Layer.LayerType.IMAGE);
-        imageLayer.setImageContent(new Image(SliderApp.class.getResource("texture.jpg").toExternalForm()));
+        imageLayer.setImageContent(new Image(AnimakerApp.class.getResource("texture.jpg").toExternalForm()));
         Layer textLayer = new Layer("Text");
         textLayer.setTextContent("Hello World");
         textLayer.getStyleClass().add("fancy-label");
@@ -78,8 +80,8 @@ public class SliderApp extends Application {
         fadeOut.setDuration(Duration.seconds(1));
         textLayer.getOpeningTransitions().setAll(moveIn, fadeIn, rotate, scale, fadeOut, moveOut);
 
-        slider.getSlides().setAll(slide3, slide2, slide1);
-        view.setSlider(slider);
+        presentation.getSlides().setAll(slide3, slide2, slide1);
+        view.setPresentation(presentation);
 
         Scene scene = new Scene(view);
         primaryStage.setTitle("AnimakerFX");

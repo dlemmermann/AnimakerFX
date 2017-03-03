@@ -14,9 +14,9 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
-@XmlRootElement(name="slider")
+@XmlRootElement(name="presentation")
 @XmlType(propOrder = {"layout", "width", "height", "slides", "backgroundImage"})
-public class Slider extends ModelObject {
+public class Presentation extends ModelObject {
 
     public enum SliderLayout {
         FIXED_SIZE,
@@ -25,10 +25,10 @@ public class Slider extends ModelObject {
         FILL
     }
 
-    public Slider() {
+    public Presentation() {
     }
 
-    public Slider(String name) {
+    public Presentation(String name) {
         super(name);
     }
 

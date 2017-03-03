@@ -3,6 +3,10 @@ package com.animaker.view;
 import com.animaker.model.Layer;
 import com.animaker.view.skins.LayerViewSkin;
 import javafx.animation.Timeline;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
 
@@ -25,8 +29,8 @@ public class LayerView extends Control {
         setFocusTraversable(true);
     }
 
-    public SliderView getSliderView() {
-        return slideView.getSliderView();
+    public final PresentationView getPresentationView() {
+        return slideView.getPresentationView();
     }
 
     public final SlideView getSlideView() {
@@ -42,12 +46,27 @@ public class LayerView extends Control {
         return new LayerViewSkin(this);
     }
 
+    // play support (for media)
 
-    public void setupAnimation() {
+    private final BooleanProperty play = new SimpleBooleanProperty(this, "play", false);
+
+    public final BooleanProperty playProperty() {
+        return play;
+    }
+
+    public final void setPlay(boolean play) {
+        this.play.set(play);
+    }
+
+    public final boolean isPlay() {
+        return play.get();
+    }
+
+    public final void setupAnimation() {
         layer.getOpeningTransitions().forEach(transition -> transition.setup(this));
     }
 
-    public void configureAnimation(Timeline timeline) {
+    public final void configureAnimation(Timeline timeline) {
         layer.getOpeningTransitions().forEach(transition -> transition.configure(this, timeline));
     }
 }

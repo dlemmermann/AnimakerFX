@@ -1,13 +1,14 @@
 package com.animaker.view;
 
 import com.animaker.model.Slide;
+import com.animaker.view.PresentationView.Status;
 import com.animaker.view.skins.SlideViewSkin;
+import javafx.animation.Animation;
 import javafx.animation.Timeline;
 import javafx.concurrent.Worker;
 import javafx.scene.Parent;
 import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
-import javafx.scene.input.MouseEvent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,31 +20,35 @@ import java.util.stream.Collectors;
  */
 public class SlideView extends Control {
 
-    private SliderView sliderView;
+    private final PresentationView presentationView;
     private final Slide slide;
-    private Timeline timeline = new Timeline();
+    private final Timeline timeline = new Timeline();
 
-    public SlideView(SliderView sliderView, Slide slide) {
-        this.sliderView = Objects.requireNonNull(sliderView);
+    public SlideView(PresentationView presentationView, Slide slide) {
+        this.presentationView = Objects.requireNonNull(presentationView);
         this.slide = Objects.requireNonNull(slide);
 
         getStyleClass().add("slide");
 
-        addEventFilter(MouseEvent.MOUSE_CLICKED, evt -> {
-//            if (evt.getCode().equals(KeyCode.SPACE)) {
-            switch (timeline.getStatus()) {
-                case RUNNING:
+        presentationView.statusProperty().addListener(it -> {
+            switch (presentationView.getStatus()) {
+                case STOPPED:
                     stop();
                     break;
-                case STOPPED:
-                    play();
+                case PLAY:
+                    if (timeline.getStatus().equals(Animation.Status.PAUSED)) {
+                        resume();
+                    } else {
+                        play();
+                    }
                     break;
                 case PAUSED:
-                    resume();
+                    pause();
                     break;
             }
-            //          }
         });
+
+        timeline.setOnFinished(evt -> presentationView.setStatus(Status.STOPPED));
     }
 
     @Override
@@ -51,8 +56,8 @@ public class SlideView extends Control {
         return new SlideViewSkin(this);
     }
 
-    public final SliderView getSliderView() {
-        return sliderView;
+    public final PresentationView getPresentationView() {
+        return presentationView;
     }
 
     public final Slide getSlide() {
@@ -67,7 +72,6 @@ public class SlideView extends Control {
         }
 
         final List<LayerView> layerViews = getLayerViews();
-        System.out.println(layerViews.size() + " layer views");
         layerViews.forEach(view -> view.setupAnimation());
         layerViews.forEach(view -> view.configureAnimation(timeline));
 
@@ -94,7 +98,12 @@ public class SlideView extends Control {
     }
 
     public final void stop() {
+        System.out.println("SlideView: stopping timeline");
         timeline.stop();
+    }
+
+    public final void pause() {
+        timeline.pause();
     }
 
     public final void resume() {

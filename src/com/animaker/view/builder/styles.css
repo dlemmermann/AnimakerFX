@@ -104,10 +104,10 @@
     -fx-border-radius: 0;
 }
 
-.slider {
-    -fx-border-color: cyan;
+.layer-button {
+    -fx-fill: white;
 }
 
-.slider:focused {
-    -fx-border-color: red;
+.palette-button {
+    -fx-fill: white;
 }

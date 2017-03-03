@@ -3,8 +3,9 @@ package com.animaker.view.skins.builder;
 import com.animaker.model.*;
 import com.animaker.view.builder.SlidesPaletteView;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
-import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
+import de.jensd.fx.glyphs.fontawesome.utils.FontAwesomeIconFactory;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
@@ -29,14 +30,15 @@ public class SlidesPaletteViewSkin extends SkinBase<SlidesPaletteView> {
         hbox.setFillHeight(true);
         hbox.setAlignment(Pos.CENTER_LEFT);
 
-        FontAwesomeIconView plusIcon = new FontAwesomeIconView(FontAwesomeIcon.PLUS);
-        plusIcon.setGlyphSize(16);
+        Node plusIcon = FontAwesomeIconFactory.get().createIcon(FontAwesomeIcon.PLUS);
+        plusIcon.getStyleClass().add("palette-button");
+
         Button addSlideButton = new Button();
         addSlideButton.setOnAction(evt -> {
-            com.animaker.model.Slider slider = view.getSlider();
-            if (slider != null) {
+            Presentation presentation = view.getPresentation();
+            if (presentation != null) {
                 Slide slide = new Slide("Untitled");
-                slider.getSlides().add(slide);
+                presentation.getSlides().add(slide);
             }
         });
 
@@ -58,9 +60,9 @@ public class SlidesPaletteViewSkin extends SkinBase<SlidesPaletteView> {
     }
 
     private void updateView() {
-        com.animaker.model.Slider slider = getSkinnable().getSlider();
-        if (slider != null) {
-            listView.setItems(slider.getSlides());
+        Presentation presentation = getSkinnable().getPresentation();
+        if (presentation != null) {
+            listView.setItems(presentation.getSlides());
         } else {
             listView.setItems(null);
         }

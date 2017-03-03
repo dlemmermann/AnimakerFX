@@ -139,16 +139,11 @@ public class Layer extends ModelObject {
 
     // loop transition support
 
-
-
     // ending transition support
-
 
     // hover transition support
 
-
     // parallax transition support
-
 
     // type support
 
