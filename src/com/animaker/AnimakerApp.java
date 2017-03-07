@@ -81,7 +81,9 @@ public class AnimakerApp extends Application {
         textLayer.getOpeningTransitions().setAll(moveIn, fadeIn, rotate, scale, fadeOut, moveOut);
 
         presentation.getSlides().setAll(slide3, slide2, slide1);
-        view.setPresentation(presentation);
+        //view.setPresentation(presentation);
+
+        view.projectProperty().addListener(it -> primaryStage.setTitle("AnimakerFX: " + view.getProject().getName()));
 
         Scene scene = new Scene(view);
         primaryStage.setTitle("AnimakerFX");

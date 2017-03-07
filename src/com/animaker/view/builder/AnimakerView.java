@@ -16,12 +16,32 @@ public class AnimakerView extends Control {
 
     public AnimakerView() {
         getStylesheets().add(AnimakerView.class.getResource("styles.css").toExternalForm());
+
+        presentationProperty().addListener(it -> System.out.println("presentation now: " + getPresentation()));
     }
 
     @Override
     protected Skin<?> createDefaultSkin() {
         return new AnimakerViewSkin(this);
     }
+
+    // project support
+
+    private final ObjectProperty<Project> project = new SimpleObjectProperty<>(this, "project");
+
+    public final ObjectProperty<Project> projectProperty() {
+        return project;
+    }
+
+    public final void setProject(Project project) {
+        this.project.set(project);
+    }
+
+    public final Project getProject() {
+        return project.get();
+    }
+
+    // presentation support
 
     private final ObjectProperty<Presentation> presentation = new SimpleObjectProperty<>(this, "presentation");
 

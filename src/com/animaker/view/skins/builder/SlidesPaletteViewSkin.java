@@ -4,6 +4,7 @@ import com.animaker.model.*;
 import com.animaker.view.builder.SlidesPaletteView;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.utils.FontAwesomeIconFactory;
+import javafx.collections.FXCollections;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.*;
@@ -23,7 +24,7 @@ public class SlidesPaletteViewSkin extends SkinBase<SlidesPaletteView> {
         listView = new ListView<>();
         listView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         listView.setFocusTraversable(false);
-        //listView.setCellFactory(listView -> new SlideCell());
+        listView.setCellFactory(listView -> new SlideCell());
         view.selectedSlideProperty().bind(listView.getSelectionModel().selectedItemProperty());
 
         HBox hbox = new HBox();
@@ -56,6 +57,7 @@ public class SlidesPaletteViewSkin extends SkinBase<SlidesPaletteView> {
 
         getChildren().add(borderPane);
 
+        view.presentationProperty().addListener(it -> updateView());
         updateView();
     }
 
@@ -64,7 +66,7 @@ public class SlidesPaletteViewSkin extends SkinBase<SlidesPaletteView> {
         if (presentation != null) {
             listView.setItems(presentation.getSlides());
         } else {
-            listView.setItems(null);
+            listView.setItems(FXCollections.emptyObservableList());
         }
 
         if (!listView.getItems().isEmpty()) {
@@ -75,6 +77,15 @@ public class SlidesPaletteViewSkin extends SkinBase<SlidesPaletteView> {
     static class SlideCell extends ListCell<Slide> {
 
         public SlideCell() {
+        }
+
+        @Override
+        protected void updateItem(Slide item, boolean empty) {
+            super.updateItem(item, empty);
+
+            if (item != null) {
+                textProperty().bind(item.nameProperty());
+            }
         }
     }
 }

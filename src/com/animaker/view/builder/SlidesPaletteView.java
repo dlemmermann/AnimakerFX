@@ -11,6 +11,7 @@ import javafx.scene.control.Skin;
 public class SlidesPaletteView extends Control {
 
     public SlidesPaletteView() {
+        presentationProperty().addListener(it -> System.out.println("slides palette: presentation now: " + getPresentation()));
     }
 
     @Override

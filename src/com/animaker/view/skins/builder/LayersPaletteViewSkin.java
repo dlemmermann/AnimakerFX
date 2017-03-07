@@ -9,6 +9,7 @@ import de.jensd.fx.glyphs.fontawesome.utils.FontAwesomeIconFactory;
 import javafx.beans.InvalidationListener;
 import javafx.beans.WeakInvalidationListener;
 import javafx.beans.binding.Bindings;
+import javafx.collections.FXCollections;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.*;
@@ -68,7 +69,7 @@ public class LayersPaletteViewSkin extends SkinBase<LayersPaletteView> {
         if (slide != null) {
             listView.setItems(slide.getLayers());
         } else {
-            listView.setItems(null);
+            listView.setItems(FXCollections.emptyObservableList());
         }
 
         if (!listView.getItems().isEmpty()) {

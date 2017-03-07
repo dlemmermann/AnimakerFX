@@ -111,3 +111,7 @@
 .palette-button {
     -fx-fill: white;
 }
+
+.new-project-pane {
+    -fx-background-color: red;
+}

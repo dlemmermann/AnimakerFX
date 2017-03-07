@@ -5,15 +5,24 @@ import com.animaker.model.Presentation;
 import com.animaker.model.Slide;
 import com.animaker.view.PresentationView;
 import com.animaker.view.PresentationView.Status;
+import com.animaker.view.builder.AnimakerView;
 import com.animaker.view.builder.LayerSettingsView;
 import com.animaker.view.builder.LayersPaletteView;
-import com.animaker.view.builder.AnimakerView;
+import com.animaker.view.builder.NewProjectPane;
+import com.animaker.view.builder.Project;
 import com.animaker.view.builder.SlidesPaletteView;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.geometry.Pos;
 import javafx.geometry.Side;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuBar;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.SkinBase;
+import javafx.scene.control.TextInputDialog;
+import javafx.scene.control.ToolBar;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.MouseEvent;
@@ -22,6 +31,7 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.stage.FileChooser;
 import org.controlsfx.control.MasterDetailPane;
 import org.controlsfx.control.PropertySheet;
 import org.controlsfx.property.BeanPropertyUtils;
@@ -103,8 +113,12 @@ public class AnimakerViewSkin extends SkinBase<AnimakerView> {
 
         view.setPrefSize(1500, 800);
 
-        view.selectedSlideProperty().addListener(it -> propertySheet.getItems().
-                setAll(BeanPropertyUtils.getProperties(view.getSelectedSlide())));
+        view.selectedSlideProperty().addListener(it -> {
+            Slide slide = view.getSelectedSlide();
+            if (slide != null) {
+                propertySheet.getItems().setAll(BeanPropertyUtils.getProperties(view.getSelectedSlide()));
+            }
+        });
 
         view.selectedLayerProperty().addListener(it -> {
             Layer layer = view.getSelectedLayer();
@@ -120,6 +134,11 @@ public class AnimakerViewSkin extends SkinBase<AnimakerView> {
         MenuBar menuBar = new MenuBar();
 
         Menu fileMenu = new Menu("File");
+
+        MenuItem newProjectItem = new MenuItem("New Presentation...");
+        newProjectItem.setOnAction(evt -> newProject());
+        fileMenu.getItems().add(newProjectItem);
+
         MenuItem quitItem = new MenuItem("Quit");
         quitItem.setOnAction(evt -> Platform.exit());
         quitItem.setAccelerator(KeyCombination.valueOf("SHORTCUT+Q"));
@@ -135,12 +154,12 @@ public class AnimakerViewSkin extends SkinBase<AnimakerView> {
 
         // save
         Button save = new Button("Save");
-        save.setOnAction(evt -> saveSlider());
+        save.setOnAction(evt -> savePresentation());
         bar.getItems().add(save);
 
         // load
         Button load = new Button("Load");
-        load.setOnAction(evt -> loadSlider());
+        load.setOnAction(evt -> loadPresentation());
         bar.getItems().add(load);
 
         // add slide
@@ -168,23 +187,50 @@ public class AnimakerViewSkin extends SkinBase<AnimakerView> {
         return bar;
     }
 
-    private void saveSlider() {
+    private void newProject() {
+        NewProjectPane pane = new NewProjectPane();
+        Project project = pane.showAndWait(getSkinnable().getScene().getWindow());
+        newProject(project);
+    }
+
+    private void newProject(Project project) {
+        getSkinnable().setProject(project);
+        Presentation presentation = new Presentation();
+        presentation.setName(project.getName());
+        getSkinnable().setPresentation(presentation);
+        savePresentation();
+    }
+
+    private void savePresentation() {
         try {
+            Project project = getSkinnable().getProject();
+            Presentation presentation = getSkinnable().getPresentation();
             JAXBContext ctx = JAXBContext.newInstance(Presentation.class);
             Marshaller marshaller = ctx.createMarshaller();
             marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-            marshaller.marshal(getSkinnable().getPresentation(), new File(System.getProperty("user.home"), "SliderFX.xml"));
+            marshaller.marshal(presentation, new File(project.getLocation(), project.getName() + ".xml"));
         } catch (JAXBException e) {
             e.printStackTrace();
         }
     }
 
-    private void loadSlider() {
+    private FileChooser fileChooser = new FileChooser();
+
+    private void loadPresentation() {
+        final File file = fileChooser.showOpenDialog(getSkinnable().getScene().getWindow());
+        if (file != null) {
+            loadPresentation(file);
+        }
+    }
+
+    private void loadPresentation(File file) {
         try {
             JAXBContext ctx = JAXBContext.newInstance(Presentation.class);
             Unmarshaller unmarshaller = ctx.createUnmarshaller();
-            Presentation presentation = (Presentation) unmarshaller.unmarshal(new File(System.getProperty("user.home"), "SliderFX.xml"));
+            Presentation presentation = (Presentation) unmarshaller.unmarshal(file);
             getSkinnable().setPresentation(presentation);
+            Project project = new Project(presentation.getName(), file.getParentFile().getAbsolutePath());
+            getSkinnable().setProject(project);
         } catch (JAXBException e) {
             e.printStackTrace();
         }
