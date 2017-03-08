@@ -4,7 +4,6 @@ import com.animaker.model.transition.Transition;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.scene.image.Image;
 
 import javax.xml.bind.annotation.XmlType;
 
@@ -137,14 +136,6 @@ public class Layer extends ModelObject {
         return enableOpeningTransitions.get();
     }
 
-    // loop transition support
-
-    // ending transition support
-
-    // hover transition support
-
-    // parallax transition support
-
     // type support
 
     private final ObjectProperty<LayerType> type = new SimpleObjectProperty<>(this, "layer", LayerType.IMAGE);
@@ -209,36 +200,36 @@ public class Layer extends ModelObject {
         this.textContent.set(content);
     }
 
-    // image content support
+    // image file name support
 
-    private final ObjectProperty<Image> imageContent = new SimpleObjectProperty<>(this, "imageContent");
+    private final StringProperty imageFileName = new SimpleStringProperty(this, "imageFileName");
 
-    public final ObjectProperty imageContentProperty() {
-        return imageContent;
+    public final StringProperty imageFileNameProperty() {
+        return imageFileName;
     }
 
-    public final Image getImageContent() {
-        return imageContent.get();
+    public final String getImageFileName() {
+        return imageFileName.get();
     }
 
-    public final void setImageContent(Image content) {
-        this.imageContent.set(content);
+    public final void setImageFileName(String content) {
+        this.imageFileName.set(content);
     }
 
     // video content support
 
-    private final StringProperty videoContent = new SimpleStringProperty(this, "videoContent");
+    private final StringProperty videoFileName = new SimpleStringProperty(this, "videoFileName");
 
-    public final StringProperty videoContentProperty() {
-        return videoContent;
+    public final StringProperty videoFileNameProperty() {
+        return videoFileName;
     }
 
-    public final String getVideoContent() {
-        return videoContent.get();
+    public final String getVideoFileName() {
+        return videoFileName.get();
     }
 
-    public final void setVideoContent(String content) {
-        this.videoContent.set(content);
+    public final void setVideoFileName(String content) {
+        this.videoFileName.set(content);
     }
 
     // video content support / preserve ratio
@@ -259,18 +250,18 @@ public class Layer extends ModelObject {
 
     // fxml content support
 
-    private final StringProperty fxmlContent = new SimpleStringProperty(this, "fxmlContent");
+    private final StringProperty fxmlFileName = new SimpleStringProperty(this, "fxmlFileName");
 
-    public final StringProperty fxmlContentProperty() {
-        return fxmlContent;
+    public final StringProperty fxmlFileNameProperty() {
+        return fxmlFileName;
     }
 
-    public final String getFxmlContent() {
-        return fxmlContent.get();
+    public final String getFxmlFileName() {
+        return fxmlFileName.get();
     }
 
-    public final void setFxmlContent(String content) {
-        this.fxmlContent.set(content);
+    public final void setFxmlFileName(String content) {
+        this.fxmlFileName.set(content);
     }
 
     // code content support

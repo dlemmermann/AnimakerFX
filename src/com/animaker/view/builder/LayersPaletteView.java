@@ -11,7 +11,9 @@ import javafx.scene.control.Skin;
  */
 public class LayersPaletteView extends SlideControlBase {
 
-    public LayersPaletteView() {
+    public LayersPaletteView(Workbench workbench) {
+        super(workbench);
+
         getStyleClass().add("palette");
     }
 

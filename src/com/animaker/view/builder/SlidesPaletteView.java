@@ -8,15 +8,28 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
 
+import java.util.Objects;
+
 public class SlidesPaletteView extends Control {
 
-    public SlidesPaletteView() {
+    private Workbench workbench;
+
+    public SlidesPaletteView(Workbench workbench) {
+        this.workbench = Objects.requireNonNull(workbench);
         getStyleClass().add("palette");
     }
 
     @Override
     protected Skin<?> createDefaultSkin() {
         return new SlidesPaletteViewSkin(this);
+    }
+
+    public final Workbench getWorkbench() {
+        return workbench;
+    }
+
+    public final Project getProject() {
+        return getWorkbench().getProject();
     }
 
     // presentation support

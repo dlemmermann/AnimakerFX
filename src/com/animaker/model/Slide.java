@@ -13,13 +13,13 @@ import javax.xml.bind.annotation.XmlType;
 @XmlType(name="Slide")
 public class Slide extends ModelObject {
 
+
     public Slide() {
     }
 
     public Slide(String name) {
         super(name);
     }
-
 
     // image content support
 

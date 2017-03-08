@@ -2,6 +2,7 @@ package com.animaker.view.skins.builder;
 
 import com.animaker.view.builder.LayerTransitionsView;
 import com.animaker.view.builder.TransitionSettingsView;
+import com.animaker.view.builder.Workbench;
 import javafx.geometry.Orientation;
 import javafx.scene.control.Separator;
 import javafx.scene.control.SkinBase;
@@ -16,11 +17,12 @@ public class LayerTransitionsViewSkin extends SkinBase<LayerTransitionsView> {
     public LayerTransitionsViewSkin(LayerTransitionsView view) {
         super(view);
 
-        TransitionSettingsView openingTransition = new TransitionSettingsView("Opening");
-        TransitionSettingsView loopTransition = new TransitionSettingsView("Loop");
-        TransitionSettingsView endingTransition = new TransitionSettingsView("Ending");
-        TransitionSettingsView hoverTransition = new TransitionSettingsView("Hover");
-        TransitionSettingsView parallaxTransition = new TransitionSettingsView("Parallax");
+        final Workbench workbench = view.getWorkbench();
+        TransitionSettingsView openingTransition = new TransitionSettingsView(workbench, "Opening");
+        TransitionSettingsView loopTransition = new TransitionSettingsView(workbench, "Loop");
+        TransitionSettingsView endingTransition = new TransitionSettingsView(workbench, "Ending");
+        TransitionSettingsView hoverTransition = new TransitionSettingsView(workbench, "Hover");
+        TransitionSettingsView parallaxTransition = new TransitionSettingsView(workbench, "Parallax");
 
         Separator sep1 = new Separator(Orientation.VERTICAL);
         Separator sep2 = new Separator(Orientation.VERTICAL);

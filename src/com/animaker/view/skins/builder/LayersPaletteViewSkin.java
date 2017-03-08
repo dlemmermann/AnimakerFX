@@ -94,7 +94,7 @@ public class LayersPaletteViewSkin extends SkinBase<LayersPaletteView> {
         }
     }
 
-    static class LayerCell extends ListCell<Layer> {
+    class LayerCell extends ListCell<Layer> {
 
         private VBox vbox;
         private MenuButton typeButton = new MenuButton();
@@ -156,7 +156,7 @@ public class LayersPaletteViewSkin extends SkinBase<LayersPaletteView> {
 
             selectedProperty().addListener(it -> {
                 if (isSelected()) {
-                    settingsView = new LayerContentView();
+                    settingsView = new LayerContentView(getSkinnable().getWorkbench());
                     settingsView.setLayer(getItem());
                     vbox.getChildren().add(settingsView);
                 } else if (settingsView != null) {

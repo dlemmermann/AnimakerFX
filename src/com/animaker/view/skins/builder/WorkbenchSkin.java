@@ -5,7 +5,7 @@ import com.animaker.model.Presentation;
 import com.animaker.model.Slide;
 import com.animaker.view.PresentationView;
 import com.animaker.view.PresentationView.Status;
-import com.animaker.view.builder.AnimakerView;
+import com.animaker.view.builder.Workbench;
 import com.animaker.view.builder.LayersPaletteView;
 import com.animaker.view.builder.NewProjectPane;
 import com.animaker.view.builder.Project;
@@ -47,7 +47,7 @@ import java.util.prefs.Preferences;
 /**
  * Created by lemmi on 19.12.16.
  */
-public class AnimakerViewSkin extends SkinBase<AnimakerView> {
+public class WorkbenchSkin extends SkinBase<Workbench> {
 
     public static final String PREF_KEY = "last.animation.project";
     public static final String PREF_SEPARATOR = "!";
@@ -59,15 +59,15 @@ public class AnimakerViewSkin extends SkinBase<AnimakerView> {
     private MasterDetailPane centerPane;
     private Button playSlide;
 
-    public AnimakerViewSkin(AnimakerView view) {
+    public WorkbenchSkin(Workbench view) {
         super(view);
 
         MenuBar menuBar = createMenuBar();
 
         propertySheet = new PropertySheet();
-        slidesPaletteView = new SlidesPaletteView();
+        slidesPaletteView = new SlidesPaletteView(view);
         slidesPaletteView.setPrefHeight(200);
-        layersPaletteView = new LayersPaletteView();
+        layersPaletteView = new LayersPaletteView(view);
         centerPane = new MasterDetailPane();
         centerPane.setDetailSide(Side.BOTTOM);
         centerPane.setDividerPosition(.7);
@@ -295,10 +295,10 @@ public class AnimakerViewSkin extends SkinBase<AnimakerView> {
             Bindings.unbindBidirectional(presentationView.currentSlideProperty(), getSkinnable().selectedSlideProperty());
         }
 
+        Project project = getSkinnable().getProject();
         Presentation presentation = getSkinnable().getPresentation();
-        presentationView = new PresentationView(presentation);
-        presentationView.addEventFilter(MouseEvent.MOUSE_CLICKED,
-                evt -> propertySheet.getItems().setAll(BeanPropertyUtils.getProperties(getSkinnable().getPresentation())));
+        presentationView = new PresentationView(project, presentation);
+        presentationView.addEventFilter(MouseEvent.MOUSE_CLICKED, evt -> propertySheet.getItems().setAll(BeanPropertyUtils.getProperties(getSkinnable().getPresentation())));
         Bindings.bindBidirectional(presentationView.currentSlideProperty(), getSkinnable().selectedSlideProperty());
 
         presentationView.statusProperty().addListener(it -> {

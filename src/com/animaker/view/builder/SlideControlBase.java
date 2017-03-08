@@ -7,8 +7,18 @@ import javafx.scene.control.Control;
 
 public abstract class SlideControlBase extends Control {
 
-    protected SlideControlBase() {
+    private Workbench workbench;
 
+    protected SlideControlBase(Workbench workbench) {
+        this.workbench = workbench;
+    }
+
+    public final Workbench getWorkbench() {
+        return workbench;
+    }
+
+    public final Project getProject() {
+        return getWorkbench().getProject();
     }
 
     private final ObjectProperty<Slide> slide = new SimpleObjectProperty<>(this, "slide");

@@ -2,6 +2,7 @@ package com.animaker.view;
 
 import com.animaker.model.Presentation;
 import com.animaker.model.Slide;
+import com.animaker.view.builder.Project;
 import com.animaker.view.skins.PresentationViewSkin;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -15,9 +16,11 @@ import java.util.Objects;
  */
 public class PresentationView extends Control {
 
+    private final Project project;
     private final Presentation presentation;
 
-    public PresentationView(Presentation presentation) {
+    public PresentationView(Project project, Presentation presentation) {
+        this.project = Objects.requireNonNull(project);
         this.presentation = Objects.requireNonNull(presentation);
 
         getStyleClass().add("presentation");
@@ -26,6 +29,10 @@ public class PresentationView extends Control {
     @Override
     protected Skin<?> createDefaultSkin() {
         return new PresentationViewSkin(this);
+    }
+
+    public final Project getProject() {
+        return project;
     }
 
     public final Presentation getPresentation() {

@@ -7,8 +7,19 @@ import javafx.scene.control.Control;
 
 public abstract class LayerControlBase extends Control {
 
-    protected LayerControlBase() {
+    private Workbench workbench;
+
+    protected LayerControlBase(Workbench workbench) {
         setStyle("-fx-background-color: white;");
+        this.workbench = workbench;
+    }
+
+    public final Workbench getWorkbench() {
+        return workbench;
+    }
+
+    public final Project getProject() {
+        return getWorkbench().getProject();
     }
 
     private final ObjectProperty<Layer> layer = new SimpleObjectProperty<>(this, "layer");

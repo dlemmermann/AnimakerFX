@@ -5,7 +5,8 @@ import javafx.scene.control.Skin;
 
 public class LayerStyleView extends LayerControlBase {
 
-    public LayerStyleView() {
+    public LayerStyleView(Workbench workbench) {
+        super(workbench);
     }
 
     @Override

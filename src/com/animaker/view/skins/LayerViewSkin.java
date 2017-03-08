@@ -3,13 +3,11 @@ package com.animaker.view.skins;
 import com.animaker.model.Layer;
 import com.animaker.view.LayerView;
 import com.animaker.view.PresentationView;
-import javafx.animation.Animation.Status;
 import javafx.beans.binding.Bindings;
-import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.SimpleDoubleProperty;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.SkinBase;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
 import javafx.scene.media.Media;
@@ -18,7 +16,8 @@ import javafx.scene.media.MediaView;
 import javafx.scene.text.Text;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
-import javafx.util.Duration;
+
+import java.io.File;
 
 public class LayerViewSkin extends SkinBase<LayerView> {
 
@@ -71,7 +70,7 @@ public class LayerViewSkin extends SkinBase<LayerView> {
     }
 
     private Node buildViewVideo() {
-        final String videoContent = layer.getVideoContent();
+        final String videoContent = layer.getVideoFileName();
         if (videoContent != null) {
             Media media = new Media(videoContent);
             MediaPlayer player = new MediaPlayer(media);
@@ -126,9 +125,25 @@ public class LayerViewSkin extends SkinBase<LayerView> {
     }
 
     private Node buildViewImage() {
-        ImageView image = new ImageView();
-        image.imageProperty().bind(layer.imageContentProperty());
-        return image;
+        ImageView imageView = new ImageView();
+        updateImageView(imageView);
+        getSkinnable().getLayer().imageFileNameProperty().addListener(it -> updateImageView(imageView));
+        return imageView;
+    }
+
+    private void updateImageView(ImageView imageView) {
+        try {
+            final String imageFileName = layer.getImageFileName();
+            if (imageFileName != null) {
+                File file = getSkinnable().getPresentationView().getProject().getFile(imageFileName);
+                Image image = new Image(file.toURI().toURL().toExternalForm());
+                imageView.setImage(image);
+            } else {
+                imageView.setImage(null);
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
 
     private Node buildViewCode() {

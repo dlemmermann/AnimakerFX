@@ -8,8 +8,8 @@ import javafx.scene.control.Skin;
  */
 public class LayerTransitionsView extends LayerControlBase {
 
-    public LayerTransitionsView() {
-
+    public LayerTransitionsView(Workbench workbench) {
+        super(workbench);
     }
 
     @Override

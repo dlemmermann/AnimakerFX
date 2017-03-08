@@ -4,11 +4,10 @@ import com.animaker.model.Layer;
 import com.animaker.model.Presentation;
 import com.animaker.model.Slide;
 import com.animaker.model.transition.*;
-import com.animaker.view.builder.AnimakerView;
+import com.animaker.view.builder.Workbench;
 import javafx.animation.Interpolator;
 import javafx.application.Application;
 import javafx.scene.Scene;
-import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
@@ -19,7 +18,7 @@ public class AnimakerApp extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        AnimakerView view = new AnimakerView();
+        Workbench view = new Workbench();
 
         Presentation presentation = new Presentation("My Presentation");
         presentation.setLayout(Presentation.SliderLayout.FIXED_SIZE);
@@ -33,8 +32,8 @@ public class AnimakerApp extends Application {
         Slide slide1 = new Slide("Big Buck Bunny");
         Layer videoLayer = new Layer("Media Player");
         videoLayer.setType(Layer.LayerType.VIDEO);
-//        videoLayer.setVideoContent("file:///Users/lemmi/Desktop/bunny.mp4");
-        videoLayer.setVideoContent("file:///Users/lemmi/Desktop/slow-motion.mp4");
+//        videoLayer.setVideoFileName("file:///Users/lemmi/Desktop/bunny.mp4");
+        videoLayer.setVideoFileName("file:///Users/lemmi/Desktop/slow-motion.mp4");
         slide1.getLayers().setAll(videoLayer);
         videoLayer.getOpeningTransitions().add(new Play());
 
@@ -49,7 +48,6 @@ public class AnimakerApp extends Application {
         Slide slide3 = new Slide("Image and Text");
         Layer imageLayer = new Layer("Background");
         imageLayer.setType(Layer.LayerType.IMAGE);
-        imageLayer.setImageContent(new Image(AnimakerApp.class.getResource("texture.jpg").toExternalForm()));
         Layer textLayer = new Layer("Text");
         textLayer.setTextContent("Hello World");
         textLayer.getStyleClass().add("fancy-label");
