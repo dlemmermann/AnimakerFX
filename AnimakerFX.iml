@@ -10,5 +10,6 @@
     <orderEntry type="library" name="controlsfx-8.40.12" level="project" />
     <orderEntry type="library" name="fontawesomefx-8.9" level="project" />
     <orderEntry type="library" name="fontawesomefx-commons-8.14" level="project" />
+    <orderEntry type="library" name="scenicView" level="project" />
   </component>
 </module>

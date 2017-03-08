@@ -3,27 +3,138 @@ package com.animaker.view.builder;
 import com.animaker.model.Layer;
 import com.animaker.model.Presentation;
 import com.animaker.model.Slide;
-import com.animaker.view.skins.builder.WorkbenchSkin;
+import com.animaker.view.PresentationView;
+import com.animaker.view.PresentationView.Status;
+import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.scene.control.Control;
-import javafx.scene.control.Skin;
+import javafx.geometry.Pos;
+import javafx.geometry.Side;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuBar;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextInputDialog;
+import javafx.scene.control.ToolBar;
+import javafx.scene.effect.DropShadow;
+import javafx.scene.input.KeyCombination;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.stage.FileChooser;
+import org.controlsfx.control.MasterDetailPane;
+import org.controlsfx.control.PropertySheet;
+import org.controlsfx.property.BeanPropertyUtils;
+import org.scenicview.ScenicView;
+import org.scenicview.view.ScenicViewGui;
+
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
+import java.io.File;
+import java.util.StringTokenizer;
+import java.util.prefs.Preferences;
 
 /**
  * Created by lemmi on 19.12.16.
  */
-public class Workbench extends Control {
+public class Workbench extends StackPane {
 
+    public static final String PREF_KEY = "last.animation.project";
+    public static final String PREF_SEPARATOR = "!";
+
+    private PropertySheet propertySheet;
+    private SlidesPaletteView slidesPaletteView;
+    private LayersPaletteView layersPaletteView;
+    private PresentationView presentationView;
+    private MasterDetailPane centerPane;
+    private Button playSlide;
 
     public Workbench() {
         getStylesheets().add(Workbench.class.getResource("styles.css").toExternalForm());
-    }
 
-    @Override
-    protected Skin<?> createDefaultSkin() {
-        return new WorkbenchSkin(this);
-    }
+        MenuBar menuBar = createMenuBar();
 
+        propertySheet = new PropertySheet();
+        slidesPaletteView = new SlidesPaletteView(this);
+        slidesPaletteView.setPrefHeight(200);
+        layersPaletteView = new LayersPaletteView(this);
+        centerPane = new MasterDetailPane();
+        centerPane.setDetailSide(Side.BOTTOM);
+        centerPane.setDividerPosition(.7);
+
+        MasterDetailPane leftHandSide = new MasterDetailPane();
+        leftHandSide.setDetailSide(Side.TOP);
+        leftHandSide.setDividerPosition(.2);
+        leftHandSide.setDetailNode(slidesPaletteView);
+        leftHandSide.setMasterNode(layersPaletteView);
+
+        centerPane.setDetailNode(new Label("Misc"));
+
+        ToolBar toolBar = createToolBar();
+
+        MasterDetailPane rightHandSide = new MasterDetailPane();
+        rightHandSide.setDetailSide(Side.RIGHT);
+        rightHandSide.setDetailNode(propertySheet);
+        rightHandSide.setMasterNode(centerPane);
+
+        MasterDetailPane centerPane = new MasterDetailPane();
+        centerPane.setDetailSide(Side.LEFT);
+        centerPane.setDividerPosition(.20);
+        centerPane.setDetailNode(leftHandSide);
+        centerPane.setMasterNode(rightHandSide);
+
+        BorderPane wrapper = new BorderPane();
+        wrapper.setTop(toolBar);
+        wrapper.setCenter(centerPane);
+
+        VBox vbox = new VBox();
+        vbox.setFillWidth(true);
+        vbox.getChildren().setAll(menuBar, wrapper);
+        VBox.setVgrow(menuBar, Priority.NEVER);
+        VBox.setVgrow(wrapper, Priority.ALWAYS);
+
+        getChildren().add(vbox);
+
+        slidesPaletteView.presentationProperty().bind(presentationProperty());
+        layersPaletteView.slideProperty().bind(slidesPaletteView.selectedSlideProperty());
+
+        Bindings.bindBidirectional(slidesPaletteView.selectedSlideProperty(), selectedSlideProperty());
+        Bindings.bindBidirectional(layersPaletteView.selectedLayerProperty(), selectedLayerProperty());
+
+
+        selectedSlideProperty().addListener(it -> updateSlide());
+
+        setPrefSize(1500, 800);
+
+        selectedSlideProperty().addListener(it -> {
+            Slide slide = getSelectedSlide();
+            if (slide != null) {
+                propertySheet.getItems().setAll(BeanPropertyUtils.getProperties(getSelectedSlide()));
+            }
+        });
+
+        selectedLayerProperty().addListener(it -> {
+            Layer layer = getSelectedLayer();
+            if (layer != null) {
+                propertySheet.getItems().
+                        setAll(BeanPropertyUtils.getProperties(getSelectedLayer()));
+            }
+        });
+
+        projectProperty().addListener(it -> savePreferences());
+
+        loadPreferences();
+        updateSlide();
+    }
+    
     // project support
 
     private final ObjectProperty<Project> project = new SimpleObjectProperty<>(this, "project");
@@ -86,5 +197,213 @@ public class Workbench extends Control {
 
     public final Layer getSelectedLayer() {
         return selectedLayer.get();
+    }
+
+    private MenuBar createMenuBar() {
+        MenuBar menuBar = new MenuBar();
+
+        Menu fileMenu = new Menu("File");
+
+        MenuItem newProjectItem = new MenuItem("New Presentation...");
+        newProjectItem.setOnAction(evt -> newProject());
+        fileMenu.getItems().add(newProjectItem);
+
+        MenuItem quitItem = new MenuItem("Quit");
+        quitItem.setOnAction(evt -> Platform.exit());
+        quitItem.setAccelerator(KeyCombination.valueOf("SHORTCUT+Q"));
+        fileMenu.getItems().add(quitItem);
+
+        MenuItem scenicViewItem = new MenuItem("Scenic View");
+        scenicViewItem.setOnAction(evt -> ScenicView.show(this));
+        fileMenu.getItems().add(scenicViewItem);
+
+        menuBar.getMenus().add(fileMenu);
+
+        return menuBar;
+    }
+
+    private ToolBar createToolBar() {
+        ToolBar bar = new ToolBar();
+
+        // save
+        Button save = new Button("Save");
+        save.setOnAction(evt -> savePresentation());
+        bar.getItems().add(save);
+
+        // load
+        Button load = new Button("Load");
+        load.setOnAction(evt -> loadPresentation());
+        bar.getItems().add(load);
+
+        // add slide
+        Button addSlide = new Button("Add Slide");
+        addSlide.setOnAction(evt -> addSlide());
+        bar.getItems().add(addSlide);
+
+        // play slide
+        playSlide = new Button("Play");
+        playSlide.setOnAction(evt -> {
+            if (playSlide.getText().equals("Pause")) {
+                pauseSlide();
+            } else {
+                playSlide();
+            }
+        });
+
+        bar.getItems().add(playSlide);
+
+        // stop slide
+        Button stopSlide = new Button("Stop");
+        stopSlide.setOnAction(evt -> stop());
+        bar.getItems().add(stopSlide);
+
+        return bar;
+    }
+
+    private void newProject() {
+        NewProjectPane pane = new NewProjectPane();
+        Project project = pane.showAndWait(getScene().getWindow());
+        newProject(project);
+    }
+
+    private void newProject(Project project) {
+        setProject(project);
+        Presentation presentation = new Presentation();
+        presentation.setName(project.getName());
+        setPresentation(presentation);
+        savePresentation();
+    }
+
+    private void savePresentation() {
+        try {
+            Project project = getProject();
+            Presentation presentation = getPresentation();
+            JAXBContext ctx = JAXBContext.newInstance(Presentation.class);
+            Marshaller marshaller = ctx.createMarshaller();
+            marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+            marshaller.marshal(presentation, getPresentationFile(project));
+        } catch (JAXBException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private File getPresentationFile(Project project) {
+        return new File(project.getLocation(), project.getName() + ".xml");
+    }
+
+    private FileChooser fileChooser = new FileChooser();
+
+    private void loadPresentation() {
+        final File file = fileChooser.showOpenDialog(getScene().getWindow());
+        if (file != null) {
+            loadPresentation(file);
+        }
+    }
+
+    private void loadPresentation(File file) {
+        try {
+            JAXBContext ctx = JAXBContext.newInstance(Presentation.class);
+            Unmarshaller unmarshaller = ctx.createUnmarshaller();
+            Presentation presentation = (Presentation) unmarshaller.unmarshal(file);
+            Project project = new Project(presentation.getName(), file.getParentFile().getAbsolutePath());
+            setProject(project);
+            setPresentation(presentation);
+        } catch (JAXBException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void savePreferences() {
+        Project project = getProject();
+        if (project != null) {
+            Preferences.userRoot().put(PREF_KEY, project.getName() + PREF_SEPARATOR + project.getLocation());
+        } else {
+            Preferences.userRoot().remove(PREF_KEY);
+        }
+    }
+
+    private void loadPreferences() {
+        String projectString = Preferences.userRoot().get(PREF_KEY, null);
+        if (projectString != null) {
+            StringTokenizer st = new StringTokenizer(projectString, PREF_SEPARATOR);
+            String name = st.nextToken();
+            String location = st.nextToken();
+            Project project = new Project(name, location);
+            loadPresentation(getPresentationFile(project));
+        }
+    }
+
+    private void addSlide() {
+        TextInputDialog dialog = new TextInputDialog();
+        dialog.setTitle("Add Slide");
+        dialog.setHeaderText("Add a new slide to the current presentation.");
+        dialog.setContentText("Presentation Name:");
+        dialog.showAndWait().ifPresent(name -> {
+            Slide slide = new Slide(name);
+            getPresentation().getSlides().add(slide);
+            setSelectedSlide(slide);
+        });
+    }
+
+    private void playSlide() {
+        presentationView.setStatus(Status.PLAY);
+    }
+
+    private void pauseSlide() {
+        presentationView.setStatus(Status.PAUSED);
+    }
+
+    private void stop() {
+        presentationView.setStatus(Status.STOPPED);
+    }
+
+    private void updateSlide() {
+        if (presentationView != null) {
+            Bindings.unbindBidirectional(presentationView.currentSlideProperty(), selectedSlideProperty());
+        }
+
+        Project project = getProject();
+        Presentation presentation = getPresentation();
+
+        if (project == null || presentation == null) {
+            return;
+        }
+
+        presentationView = new PresentationView(project, presentation);
+        presentationView.addEventFilter(MouseEvent.MOUSE_CLICKED, evt -> propertySheet.getItems().setAll(BeanPropertyUtils.getProperties(getPresentation())));
+        Bindings.bindBidirectional(presentationView.currentSlideProperty(), selectedSlideProperty());
+
+        presentationView.statusProperty().addListener(it -> {
+            switch (presentationView.getStatus()) {
+                case PLAY:
+                    playSlide.setText("Pause");
+                    break;
+                case PAUSED:
+                    playSlide.setText("Resume");
+                    break;
+                case STOPPED:
+                    playSlide.setText("Play");
+                    break;
+            }
+        });
+
+        switch (presentation.getLayout()) {
+            case FILL:
+                BorderPane.setAlignment(presentationView, Pos.CENTER);
+                centerPane.setMasterNode(presentationView);
+                break;
+            case FIXED_HEIGHT:
+            case FIXED_WIDTH:
+            case FIXED_SIZE:
+                StackPane content = new StackPane();
+                content.getChildren().add(presentationView);
+                StackPane.setAlignment(presentationView, Pos.CENTER);
+                presentationView.setEffect(new DropShadow(20, Color.BLACK));
+                ScrollPane scrollPane = new ScrollPane(content);
+                scrollPane.setFitToHeight(true);
+                scrollPane.setFitToWidth(true);
+                centerPane.setMasterNode(scrollPane);
+                break;
+        }
     }
 }

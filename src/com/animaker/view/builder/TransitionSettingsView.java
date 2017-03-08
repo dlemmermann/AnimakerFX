@@ -1,7 +1,11 @@
 package com.animaker.view.builder;
 
-import com.animaker.view.skins.builder.TransitionSettingsViewSkin;
-import javafx.scene.control.Skin;
+import javafx.geometry.Insets;
+import javafx.scene.control.Label;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import org.controlsfx.control.ToggleSwitch;
 
 import java.util.Objects;
 
@@ -10,20 +14,26 @@ import java.util.Objects;
  */
 public class TransitionSettingsView extends LayerControlBase {
 
-    private String title;
-
     public TransitionSettingsView(Workbench workbench, String title) {
         super(workbench);
 
-        this.title = Objects.requireNonNull(title);
-    }
+        Objects.requireNonNull(title);
 
-    @Override
-    protected Skin<?> createDefaultSkin() {
-        return new TransitionSettingsViewSkin(this);
-    }
+        Label titleLabel = new Label(title);
+        titleLabel.setStyle("-fx-font-weight: bold;");
+        titleLabel.setMaxWidth(Double.MAX_VALUE);
 
-    public final String getTitle() {
-        return title;
+        ToggleSwitch onOffSwitch = new ToggleSwitch();
+
+        HBox header = new HBox(10);
+        header.getChildren().setAll(titleLabel, onOffSwitch);
+        HBox.setHgrow(titleLabel, Priority.ALWAYS);
+        HBox.setHgrow(onOffSwitch, Priority.NEVER);
+
+        BorderPane borderPane = new BorderPane();
+        borderPane.setTop(header);
+        BorderPane.setMargin(header, new Insets(10));
+
+        getChildren().setAll(borderPane);
     }
 }
