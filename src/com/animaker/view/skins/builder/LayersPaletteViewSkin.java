@@ -1,10 +1,11 @@
 package com.animaker.view.skins.builder;
 
 import com.animaker.model.Layer;
+import com.animaker.model.Layer.LayerType;
 import com.animaker.model.Slide;
+import com.animaker.view.builder.LayerContentView;
 import com.animaker.view.builder.LayersPaletteView;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
-import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import de.jensd.fx.glyphs.fontawesome.utils.FontAwesomeIconFactory;
 import javafx.beans.InvalidationListener;
 import javafx.beans.WeakInvalidationListener;
@@ -12,10 +13,26 @@ import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.ContentDisplay;
+import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
+import javafx.scene.control.ListView;
+import javafx.scene.control.MenuButton;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.RadioMenuItem;
+import javafx.scene.control.SelectionMode;
+import javafx.scene.control.SkinBase;
+import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleButton;
+import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class LayersPaletteViewSkin extends SkinBase<LayersPaletteView> {
 
@@ -79,10 +96,12 @@ public class LayersPaletteViewSkin extends SkinBase<LayersPaletteView> {
 
     static class LayerCell extends ListCell<Layer> {
 
-        private Label previewLabel = new Label();
+        private VBox vbox;
+        private MenuButton typeButton = new MenuButton();
         private ToggleButton lockedButton = new ToggleButton();
         private ToggleButton visibleButton = new ToggleButton();
         private TextField nameField = new TextField();
+        private Map<LayerType, RadioMenuItem> typeItemMap = new HashMap<>();
 
         public LayerCell() {
             Node eyeIcon = FontAwesomeIconFactory.get().createIcon(FontAwesomeIcon.EYE);
@@ -93,12 +112,21 @@ public class LayersPaletteViewSkin extends SkinBase<LayersPaletteView> {
             HBox.setHgrow(nameField, Priority.ALWAYS);
             HBox.setHgrow(visibleButton, Priority.NEVER);
             HBox.setHgrow(lockedButton, Priority.NEVER);
-            HBox.setHgrow(previewLabel, Priority.NEVER);
+            HBox.setHgrow(typeButton, Priority.NEVER);
 
             HBox box = new HBox(5);
             box.setAlignment(Pos.CENTER);
-            box.getChildren().setAll(previewLabel, nameField, visibleButton, lockedButton);
-            box.visibleProperty().bind(Bindings.isNotNull(itemProperty()));
+            box.getChildren().setAll(typeButton, nameField, visibleButton, lockedButton);
+
+            ToggleGroup group = new ToggleGroup();
+            for (LayerType type : LayerType.values()) {
+                RadioMenuItem item = new RadioMenuItem();
+                item.setToggleGroup(group);
+                item.setOnAction(evt -> getItem().setType(type));
+                item.setGraphic(getTypeIcon(type));
+                typeButton.getItems().add(item);
+                typeItemMap.put(type, item);
+            }
 
             itemProperty().addListener((observable, oldLayer, newLayer) -> {
                 if (newLayer != null) {
@@ -106,13 +134,13 @@ public class LayersPaletteViewSkin extends SkinBase<LayersPaletteView> {
                     Bindings.bindBidirectional(lockedButton.selectedProperty(), newLayer.lockedProperty());
                     Bindings.bindBidirectional(nameField.textProperty(), newLayer.nameProperty());
 
-                    // layer type might change at any time -> update type icon
-                    previewLabel.setGraphic(getTypeIcon(newLayer));
                     newLayer.typeProperty().addListener(weakTypeChangeListener);
 
                     // lock state might change at any time -> update lock button
                     lockedButton.setGraphic(getLockIcon(newLayer));
                     newLayer.lockedProperty().addListener(weakLockChangeListener);
+
+                    typeButton.setGraphic(getTypeIcon(newLayer.getType()));
                 }
                 if (oldLayer != null) {
                     Bindings.unbindBidirectional(visibleButton.selectedProperty(), oldLayer.visibleProperty());
@@ -121,11 +149,37 @@ public class LayersPaletteViewSkin extends SkinBase<LayersPaletteView> {
                 }
             });
 
+            vbox = new VBox();
+            vbox.setFillWidth(true);
+            vbox.getChildren().add(box);
+            vbox.visibleProperty().bind(Bindings.isNotNull(itemProperty()));
+
+            selectedProperty().addListener(it -> {
+                if (isSelected()) {
+                    settingsView = new LayerContentView();
+                    settingsView.setLayer(getItem());
+                    vbox.getChildren().add(settingsView);
+                } else if (settingsView != null) {
+                    vbox.getChildren().remove(settingsView);
+                    settingsView = null;
+                }
+            });
+
             setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
-            setGraphic(box);
+            setGraphic(vbox);
         }
 
-        private InvalidationListener typeChangeListener = it -> previewLabel.setGraphic(getTypeIcon(getItem()));
+        private LayerContentView settingsView;
+
+        private InvalidationListener typeChangeListener = it -> {
+            Layer layer = getItem();
+            if (layer != null) {
+                LayerType layerType = layer.getType();
+                RadioMenuItem item = typeItemMap.get(layerType);
+                item.setSelected(true);
+                typeButton.setGraphic(getTypeIcon(layerType));
+            }
+        };
 
         private WeakInvalidationListener weakTypeChangeListener = new WeakInvalidationListener(typeChangeListener);
 
@@ -133,35 +187,31 @@ public class LayersPaletteViewSkin extends SkinBase<LayersPaletteView> {
 
         private WeakInvalidationListener weakLockChangeListener = new WeakInvalidationListener(lockChangeListener);
 
-        private Node getTypeIcon(Layer layer) {
+        private Node getTypeIcon(LayerType type) {
             Node view = null;
 
-            if (layer != null) {
-                switch (layer.getType()) {
-                    case CODE:
-                        view = FontAwesomeIconFactory.get().createIcon(FontAwesomeIcon.GEARS);
-                        break;
-                    case TEXT:
-                        view = FontAwesomeIconFactory.get().createIcon(FontAwesomeIcon.FONT);
-                        break;
-                    case FXML:
-                        view = FontAwesomeIconFactory.get().createIcon(FontAwesomeIcon.CODE);
-                        break;
-                    case IMAGE:
-                        view = FontAwesomeIconFactory.get().createIcon(FontAwesomeIcon.IMAGE);
-                        break;
-                    case VIDEO:
-                        view = FontAwesomeIconFactory.get().createIcon(FontAwesomeIcon.VIDEO_CAMERA);
-                        break;
-                    case HTML:
-                        view = FontAwesomeIconFactory.get().createIcon(FontAwesomeIcon.HTML5);
-                        break;
-                    default:
-                        throw new IllegalArgumentException("unsupported layer type: " + layer.getType());
-                }
-
-                view.getStyleClass().add("layer-button");
+            switch (type) {
+                case CODE:
+                    view = FontAwesomeIconFactory.get().createIcon(FontAwesomeIcon.GEARS);
+                    break;
+                case TEXT:
+                    view = FontAwesomeIconFactory.get().createIcon(FontAwesomeIcon.FONT);
+                    break;
+                case FXML:
+                    view = FontAwesomeIconFactory.get().createIcon(FontAwesomeIcon.CODE);
+                    break;
+                case IMAGE:
+                    view = FontAwesomeIconFactory.get().createIcon(FontAwesomeIcon.IMAGE);
+                    break;
+                case VIDEO:
+                    view = FontAwesomeIconFactory.get().createIcon(FontAwesomeIcon.VIDEO_CAMERA);
+                    break;
+                case HTML:
+                    view = FontAwesomeIconFactory.get().createIcon(FontAwesomeIcon.HTML5);
+                    break;
             }
+
+            view.getStyleClass().add("layer-button");
 
 
             return view;

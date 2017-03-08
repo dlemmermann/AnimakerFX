@@ -8,6 +8,10 @@
     -emphasize: rgba(69, 78, 95, 1);
 }
 
+.field-label {
+    -fx-text-fill: white;
+}
+
 .split-pane-divider {
     -fx-background-color: -fx-base;
     -fx-border-color: black;
@@ -21,21 +25,21 @@
     -fx-border-width: 0 .5 0 .5;
 }
 
-.list-cell:odd,
-.list-cell:even {
+.palette .list-cell:odd,
+.palette .list-cell:even {
     -fx-border-width: 0 0 0 5;
     -fx-border-color: transparent;
     -fx-background-color: -fx-base;
     -fx-text-fill: -fx-light-text-color;
 }
 
-.list-cell .textfield {
-    -fx-background-color: transparent;
-}
-
-.list-cell:selected {
+.palette .list-cell:selected {
     -fx-border-color: burlywood;
     -fx-border-width: 0 0 0 5;
+}
+
+.list-cell .textfield {
+    -fx-background-color: transparent;
 }
 
 .property-sheet .viewport, .property-pane {

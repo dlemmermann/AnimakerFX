@@ -9,15 +9,16 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
 
+import java.util.prefs.Preferences;
+
 /**
  * Created by lemmi on 19.12.16.
  */
 public class AnimakerView extends Control {
 
+
     public AnimakerView() {
         getStylesheets().add(AnimakerView.class.getResource("styles.css").toExternalForm());
-
-        presentationProperty().addListener(it -> System.out.println("presentation now: " + getPresentation()));
     }
 
     @Override

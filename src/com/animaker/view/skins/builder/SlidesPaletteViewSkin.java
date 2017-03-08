@@ -75,7 +75,7 @@ public class SlidesPaletteViewSkin extends SkinBase<SlidesPaletteView> {
     }
 
     static class SlideCell extends ListCell<Slide> {
-
+        
         public SlideCell() {
         }
 

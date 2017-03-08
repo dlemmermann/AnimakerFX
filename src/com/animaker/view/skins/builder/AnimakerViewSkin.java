@@ -6,7 +6,6 @@ import com.animaker.model.Slide;
 import com.animaker.view.PresentationView;
 import com.animaker.view.PresentationView.Status;
 import com.animaker.view.builder.AnimakerView;
-import com.animaker.view.builder.LayerSettingsView;
 import com.animaker.view.builder.LayersPaletteView;
 import com.animaker.view.builder.NewProjectPane;
 import com.animaker.view.builder.Project;
@@ -16,6 +15,7 @@ import javafx.beans.binding.Bindings;
 import javafx.geometry.Pos;
 import javafx.geometry.Side;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
@@ -41,13 +41,18 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import java.io.File;
+import java.util.StringTokenizer;
+import java.util.prefs.Preferences;
 
 /**
  * Created by lemmi on 19.12.16.
  */
 public class AnimakerViewSkin extends SkinBase<AnimakerView> {
 
-    private final PropertySheet propertySheet;
+    public static final String PREF_KEY = "last.animation.project";
+    public static final String PREF_SEPARATOR = "!";
+
+    private PropertySheet propertySheet;
     private SlidesPaletteView slidesPaletteView;
     private LayersPaletteView layersPaletteView;
     private PresentationView presentationView;
@@ -73,9 +78,7 @@ public class AnimakerViewSkin extends SkinBase<AnimakerView> {
         leftHandSide.setDetailNode(slidesPaletteView);
         leftHandSide.setMasterNode(layersPaletteView);
 
-        LayerSettingsView layerSettingsView = new LayerSettingsView();
-        layerSettingsView.layerProperty().bind(view.selectedLayerProperty());
-        centerPane.setDetailNode(layerSettingsView);
+        centerPane.setDetailNode(new Label("Misc"));
 
         ToolBar toolBar = createToolBar();
 
@@ -128,6 +131,9 @@ public class AnimakerViewSkin extends SkinBase<AnimakerView> {
             }
         });
 
+        view.projectProperty().addListener(it -> savePreferences());
+
+        loadPreferences();
     }
 
     private MenuBar createMenuBar() {
@@ -208,10 +214,14 @@ public class AnimakerViewSkin extends SkinBase<AnimakerView> {
             JAXBContext ctx = JAXBContext.newInstance(Presentation.class);
             Marshaller marshaller = ctx.createMarshaller();
             marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-            marshaller.marshal(presentation, new File(project.getLocation(), project.getName() + ".xml"));
+            marshaller.marshal(presentation, getPresentationFile(project));
         } catch (JAXBException e) {
             e.printStackTrace();
         }
+    }
+
+    private File getPresentationFile(Project project) {
+        return new File(project.getLocation(), project.getName() + ".xml");
     }
 
     private FileChooser fileChooser = new FileChooser();
@@ -233,6 +243,26 @@ public class AnimakerViewSkin extends SkinBase<AnimakerView> {
             getSkinnable().setProject(project);
         } catch (JAXBException e) {
             e.printStackTrace();
+        }
+    }
+
+    private void savePreferences() {
+        Project project = getSkinnable().getProject();
+        if (project != null) {
+            Preferences.userRoot().put(PREF_KEY, project.getName() + PREF_SEPARATOR + project.getLocation());
+        } else {
+            Preferences.userRoot().remove(PREF_KEY);
+        }
+    }
+
+    private void loadPreferences() {
+        String projectString = Preferences.userRoot().get(PREF_KEY, null);
+        if (projectString != null) {
+            StringTokenizer st = new StringTokenizer(projectString, PREF_SEPARATOR);
+            String name = st.nextToken();
+            String location = st.nextToken();
+            Project project = new Project(name, location);
+            loadPresentation(getPresentationFile(project));
         }
     }
 
