@@ -1,10 +1,15 @@
-package com.animaker.view.builder;
+package com.animaker.model;
 
+import com.sun.xml.internal.bind.api.impl.NameConverter.Standard;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.scene.image.Image;
 
 import java.io.File;
+import java.nio.file.CopyOption;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 
 /**
  * Created by lemmi on 07.03.17.
@@ -20,6 +25,18 @@ public class Project {
     }
 
     // utility methods
+
+    public void addFile(File file) {
+        if (file != null) {
+            try {
+                Path source = file.toPath();
+                Path target = new File(getLocation(), file.getName()).toPath();
+                Files.copy(source, target, StandardCopyOption.REPLACE_EXISTING);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        }
+    }
 
     public File getFile(String fileName) {
         return new File(getLocation(), fileName);

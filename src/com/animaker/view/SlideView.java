@@ -2,13 +2,13 @@ package com.animaker.view;
 
 import com.animaker.model.Slide;
 import com.animaker.view.PresentationView.Status;
-import com.animaker.view.skins.SlideViewSkin;
 import javafx.animation.Animation;
 import javafx.animation.Timeline;
+import javafx.beans.Observable;
 import javafx.concurrent.Worker;
 import javafx.scene.Parent;
-import javafx.scene.control.Control;
-import javafx.scene.control.Skin;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.StackPane;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,17 +18,20 @@ import java.util.stream.Collectors;
 /**
  * Created by lemmi on 19.12.16.
  */
-public class SlideView extends Control {
+public class SlideView extends StackPane {
 
     private final PresentationView presentationView;
     private final Slide slide;
     private final Timeline timeline = new Timeline();
+    private final ImageView backgroundImage;
 
     public SlideView(PresentationView presentationView, Slide slide) {
         this.presentationView = Objects.requireNonNull(presentationView);
         this.slide = Objects.requireNonNull(slide);
 
         getStyleClass().add("slide");
+
+        setManaged(false);
 
         presentationView.statusProperty().addListener(it -> {
             switch (presentationView.getStatus()) {
@@ -49,11 +52,22 @@ public class SlideView extends Control {
         });
 
         timeline.setOnFinished(evt -> presentationView.setStatus(Status.STOPPED));
+
+        slide.getLayers().addListener((Observable it) -> buildSlide());
+
+        backgroundImage = new ImageView();
+        backgroundImage.imageProperty().bind(slide.backgroundImageProperty());
+
+        buildSlide();
     }
 
-    @Override
-    protected Skin<?> createDefaultSkin() {
-        return new SlideViewSkin(this);
+    private void buildSlide() {
+        getChildren().clear();
+        getChildren().add(backgroundImage);
+        slide.getLayers().forEach(layer -> {
+            final LayerView layerView = new LayerView(this, layer);
+            getChildren().add(layerView);
+        });
     }
 
     public final PresentationView getPresentationView() {

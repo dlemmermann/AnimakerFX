@@ -8,6 +8,13 @@
     -emphasize: rgba(69, 78, 95, 1);
 }
 
+.presentation-settings-view {
+    -fx-padding: 10px;
+    -fx-background-color: -fx-base;
+    -fx-border-color: black;
+    -fx-border-width: 1 0 0 0;
+}
+
 .field-label {
     -fx-text-fill: white;
 }
@@ -118,4 +125,24 @@
 
 .new-project-pane {
     -fx-background-color: red;
+}
+
+.layer {
+    -fx-border-color: red;
+    -fx-border-style: dashed;
+    -fx-border-width: 2;
+    -fx-stroke-dash-array: 4;
+}
+
+.presentation-wrapper {
+    -fx-padding: 20px;
+}
+
+.workbench .presentation {
+    -fx-border-color: orange;
+    -fx-border-width: 1;
+}
+
+.empty-background-presentation {
+    -fx-background-color: green;
 }

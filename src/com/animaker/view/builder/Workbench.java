@@ -2,6 +2,7 @@ package com.animaker.view.builder;
 
 import com.animaker.model.Layer;
 import com.animaker.model.Presentation;
+import com.animaker.model.Project;
 import com.animaker.model.Slide;
 import com.animaker.view.PresentationView;
 import com.animaker.view.PresentationView.Status;
@@ -11,8 +12,9 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.geometry.Pos;
 import javafx.geometry.Side;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
@@ -32,7 +34,6 @@ import org.controlsfx.control.MasterDetailPane;
 import org.controlsfx.control.PropertySheet;
 import org.controlsfx.property.BeanPropertyUtils;
 import org.scenicview.ScenicView;
-import org.scenicview.view.ScenicViewGui;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -54,10 +55,12 @@ public class Workbench extends StackPane {
     private SlidesPaletteView slidesPaletteView;
     private LayersPaletteView layersPaletteView;
     private PresentationView presentationView;
-    private MasterDetailPane centerPane;
+    private MasterDetailPane presentationMasterDetailPane;
     private Button playSlide;
 
     public Workbench() {
+        getStyleClass().add("workbench");
+
         getStylesheets().add(Workbench.class.getResource("styles.css").toExternalForm());
 
         MenuBar menuBar = createMenuBar();
@@ -66,9 +69,10 @@ public class Workbench extends StackPane {
         slidesPaletteView = new SlidesPaletteView(this);
         slidesPaletteView.setPrefHeight(200);
         layersPaletteView = new LayersPaletteView(this);
-        centerPane = new MasterDetailPane();
-        centerPane.setDetailSide(Side.BOTTOM);
-        centerPane.setDividerPosition(.7);
+
+        presentationMasterDetailPane = new MasterDetailPane();
+        presentationMasterDetailPane.setDetailSide(Side.BOTTOM);
+        presentationMasterDetailPane.setDividerPosition(.7);
 
         MasterDetailPane leftHandSide = new MasterDetailPane();
         leftHandSide.setDetailSide(Side.TOP);
@@ -76,14 +80,10 @@ public class Workbench extends StackPane {
         leftHandSide.setDetailNode(slidesPaletteView);
         leftHandSide.setMasterNode(layersPaletteView);
 
-        centerPane.setDetailNode(new Label("Misc"));
-
-        ToolBar toolBar = createToolBar();
-
         MasterDetailPane rightHandSide = new MasterDetailPane();
         rightHandSide.setDetailSide(Side.RIGHT);
         rightHandSide.setDetailNode(propertySheet);
-        rightHandSide.setMasterNode(centerPane);
+        rightHandSide.setMasterNode(presentationMasterDetailPane);
 
         MasterDetailPane centerPane = new MasterDetailPane();
         centerPane.setDetailSide(Side.LEFT);
@@ -91,8 +91,17 @@ public class Workbench extends StackPane {
         centerPane.setDetailNode(leftHandSide);
         centerPane.setMasterNode(rightHandSide);
 
+        ToolBar toolBar = createToolBar();
+        PresentationSettingsView presentationSettingsView = new PresentationSettingsView();
+        presentationSettingsView.projectProperty().bind(projectProperty());
+        presentationSettingsView.presentationProperty().bind(presentationProperty());
+
+        VBox headerBox = new VBox();
+        headerBox.setFillWidth(true);
+        headerBox.getChildren().setAll(toolBar, presentationSettingsView);
+
         BorderPane wrapper = new BorderPane();
-        wrapper.setTop(toolBar);
+        wrapper.setTop(headerBox);
         wrapper.setCenter(centerPane);
 
         VBox vbox = new VBox();
@@ -108,7 +117,6 @@ public class Workbench extends StackPane {
 
         Bindings.bindBidirectional(slidesPaletteView.selectedSlideProperty(), selectedSlideProperty());
         Bindings.bindBidirectional(layersPaletteView.selectedLayerProperty(), selectedLayerProperty());
-
 
         selectedSlideProperty().addListener(it -> updateSlide());
 
@@ -134,7 +142,7 @@ public class Workbench extends StackPane {
         loadPreferences();
         updateSlide();
     }
-    
+
     // project support
 
     private final ObjectProperty<Project> project = new SimpleObjectProperty<>(this, "project");
@@ -267,6 +275,9 @@ public class Workbench extends StackPane {
     }
 
     private void newProject(Project project) {
+        if (project == null) {
+            return;
+        }
         setProject(project);
         Presentation presentation = new Presentation();
         presentation.setName(project.getName());
@@ -326,11 +337,23 @@ public class Workbench extends StackPane {
         String projectString = Preferences.userRoot().get(PREF_KEY, null);
         if (projectString != null) {
             StringTokenizer st = new StringTokenizer(projectString, PREF_SEPARATOR);
-            String name = st.nextToken();
-            String location = st.nextToken();
-            Project project = new Project(name, location);
-            loadPresentation(getPresentationFile(project));
+            try {
+                String name = st.nextToken();
+                String location = st.nextToken();
+                Project project = new Project(name, location);
+                loadPresentation(getPresentationFile(project));
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                showError("Unable to restore last project!");
+            }
         }
+    }
+
+    private void showError(String text) {
+        Alert alert = new Alert(AlertType.ERROR);
+        alert.setContentText(text);
+        alert.setHeaderText("An error has occurred.");
+        alert.showAndWait();
     }
 
     private void addSlide() {
@@ -390,7 +413,10 @@ public class Workbench extends StackPane {
         switch (presentation.getLayout()) {
             case FILL:
                 BorderPane.setAlignment(presentationView, Pos.CENTER);
-                centerPane.setMasterNode(presentationView);
+                StackPane presentationWrapper = new StackPane();
+                presentationWrapper.getStyleClass().add("presentation-wrapper");
+                presentationWrapper.getChildren().add(presentationView);
+                presentationMasterDetailPane.setMasterNode(presentationWrapper);
                 break;
             case FIXED_HEIGHT:
             case FIXED_WIDTH:
@@ -402,7 +428,7 @@ public class Workbench extends StackPane {
                 ScrollPane scrollPane = new ScrollPane(content);
                 scrollPane.setFitToHeight(true);
                 scrollPane.setFitToWidth(true);
-                centerPane.setMasterNode(scrollPane);
+                presentationMasterDetailPane.setMasterNode(scrollPane);
                 break;
         }
     }

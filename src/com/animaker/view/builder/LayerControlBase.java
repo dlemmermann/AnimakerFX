@@ -1,9 +1,9 @@
 package com.animaker.view.builder;
 
 import com.animaker.model.Layer;
+import com.animaker.model.Project;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.scene.control.Control;
 import javafx.scene.layout.StackPane;
 
 public abstract class LayerControlBase extends StackPane {

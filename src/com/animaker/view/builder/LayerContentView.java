@@ -2,6 +2,7 @@ package com.animaker.view.builder;
 
 import com.animaker.model.Layer;
 import com.animaker.model.Layer.LayerType;
+import com.animaker.model.Project;
 import javafx.beans.InvalidationListener;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -152,16 +153,12 @@ public class LayerContentView extends LayerControlBase {
                 try {
 
                     // all resource files have to be copied to the project base directory
-
-                    Path source = file.toPath();
-                    Path target = new File(getProject().getLocation(), file.getName()).toPath();
-
-                    Files.copy(source, target);
+                    getProject().addFile(file);
 
                     Layer layer = getLayer();
                     layer.setImageFileName(file.getName());
 
-                    Image image = new Image(target.toUri().toURL().toExternalForm());
+                    Image image = new Image(file.toURI().toURL().toExternalForm());
                     imageView.setImage(image);
                     getLayer().setImageFileName(file.getName());
                 } catch (Exception ex) {

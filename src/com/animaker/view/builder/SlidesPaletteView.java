@@ -2,6 +2,7 @@ package com.animaker.view.builder;
 
 import com.animaker.model.Presentation;
 import com.animaker.model.Slide;
+import com.animaker.model.Project;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.utils.FontAwesomeIconFactory;
 import javafx.beans.property.ObjectProperty;

@@ -2,6 +2,7 @@ package com.animaker;
 
 import com.animaker.model.Layer;
 import com.animaker.model.Presentation;
+import com.animaker.model.Presentation.Layout;
 import com.animaker.model.Slide;
 import com.animaker.model.transition.*;
 import com.animaker.view.builder.Workbench;
@@ -21,7 +22,7 @@ public class AnimakerApp extends Application {
         Workbench view = new Workbench();
 
         Presentation presentation = new Presentation("My Presentation");
-        presentation.setLayout(Presentation.SliderLayout.FIXED_SIZE);
+        presentation.setLayout(Layout.FIXED_SIZE);
         presentation.setWidth(960);
         presentation.setHeight(540);
         presentation.getStylesheets().add(AnimakerApp.class.getResource("demo.css").toExternalForm());

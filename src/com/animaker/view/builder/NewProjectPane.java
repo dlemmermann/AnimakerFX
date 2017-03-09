@@ -1,5 +1,6 @@
 package com.animaker.view.builder;
 
+import com.animaker.model.Project;
 import javafx.application.Platform;
 import javafx.geometry.HPos;
 import javafx.geometry.VPos;
@@ -7,7 +8,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Control;
 import javafx.scene.control.Dialog;
-import javafx.scene.control.DialogPane;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.ColumnConstraints;
@@ -16,15 +16,13 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.RowConstraints;
 import javafx.stage.DirectoryChooser;
-import javafx.stage.FileChooser;
-import javafx.stage.Stage;
 import javafx.stage.Window;
-import org.controlsfx.control.spreadsheet.Grid;
 import org.controlsfx.validation.ValidationResult;
 import org.controlsfx.validation.ValidationSupport;
 import org.controlsfx.validation.Validator;
 
 import java.io.File;
+import java.util.Optional;
 
 public class NewProjectPane extends GridPane {
 
@@ -139,6 +137,11 @@ public class NewProjectPane extends GridPane {
         });
         // work-around for https://bitbucket.org/controlsfx/controlsfx/issues/539/multiple-dialog-fields-with-validation
         Platform.runLater(() -> installValidation());
-        return dialog.showAndWait().get();
+        final Optional<Project> project = dialog.showAndWait();
+        if (project.isPresent()) {
+            return project.get();
+        }
+
+        return null;
     }
 }
