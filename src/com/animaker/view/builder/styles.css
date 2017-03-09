@@ -139,8 +139,6 @@
 }
 
 .workbench .presentation {
-    -fx-border-color: orange;
-    -fx-border-width: 1;
 }
 
 .empty-background-presentation {

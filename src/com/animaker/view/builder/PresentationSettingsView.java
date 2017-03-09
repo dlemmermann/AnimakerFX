@@ -9,8 +9,10 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.geometry.Pos;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BackgroundRepeat;
 import javafx.scene.layout.HBox;
@@ -28,6 +30,8 @@ public class PresentationSettingsView extends HBox {
     private FileSelectionField imageSelector;
     private FileSelectionField videoSelector;
     private ComboBox<BackgroundRepeat> backgroundRepeatBox;
+    private CheckBox videoInfiniteLoop;
+    private Slider videoOpacitySlider;
 
     public PresentationSettingsView() {
         super(10);
@@ -43,6 +47,8 @@ public class PresentationSettingsView extends HBox {
         imageSelector = new FileSelectionField();
         backgroundRepeatBox = new ComboBox<>();
         backgroundRepeatBox.getItems().setAll(BackgroundRepeat.values());
+        videoInfiniteLoop = new CheckBox();
+        videoOpacitySlider = new Slider(0,1, 1);
 
         videoSelector = new FileSelectionField();
 
@@ -51,15 +57,20 @@ public class PresentationSettingsView extends HBox {
         Label heightLabel = new Label("Height:");
         Label imageLabel = new Label("Image:");
         Label videoLabel = new Label("Video:");
+        Label loopLabel = new Label("Loop:");
+        Label opacityLabel = new Label("Opacity:");
 
         layoutLabel.getStyleClass().add("field-label");
         widthLabel.getStyleClass().add("field-label");
         heightLabel.getStyleClass().add("field-label");
         imageLabel.getStyleClass().add("field-label");
         videoLabel.getStyleClass().add("field-label");
+        loopLabel.getStyleClass().add("field-label");
+        opacityLabel.getStyleClass().add("field-label");
 
         getChildren().setAll(layoutLabel, layoutBox, widthLabel, widthField, heightLabel, heightField,
-                imageLabel, imageSelector, backgroundRepeatBox, videoLabel, videoSelector);
+                imageLabel, imageSelector, backgroundRepeatBox, videoLabel, videoSelector, loopLabel, videoInfiniteLoop,
+                opacityLabel, videoOpacitySlider);
 
         presentationProperty().addListener(it -> updateView());
 
@@ -82,12 +93,14 @@ public class PresentationSettingsView extends HBox {
         if (presentation != null) {
             Bindings.bindBidirectional(layoutBox.valueProperty(), presentation.layoutProperty());
             Bindings.bindBidirectional(backgroundRepeatBox.valueProperty(), presentation.backgroundRepeatProperty());
+            Bindings.bindBidirectional(videoInfiniteLoop.selectedProperty(), presentation.infiniteLoopProperty());
+            Bindings.bindBidirectional(videoOpacitySlider.valueProperty(), presentation.videoOpacityProperty());
             Bindings.bindBidirectional(widthField.textProperty(), presentation.widthProperty(), new NumberStringConverter());
             Bindings.bindBidirectional(heightField.textProperty(), presentation.heightProperty(), new NumberStringConverter());
             presentation.layoutProperty().addListener(weakUpdateSizeFieldsListener);
 
             // background image
-            String imageFileName = presentation.getBackgroundImageFileName();
+            String imageFileName = presentation.getImageFileName();
             if (imageFileName != null) {
                 imageSelector.setFile(getProject().getFile(imageFileName));
             } else {
@@ -95,15 +108,15 @@ public class PresentationSettingsView extends HBox {
             }
 
             // background video
-            String videoFileName = presentation.getBackgroundVideoFileName();
+            String videoFileName = presentation.getVideoFileName();
             if (videoFileName != null) {
                 videoSelector.setFile(getProject().getFile(videoFileName));
             } else {
                 videoSelector.setFile(null);
             }
 
-            presentation.backgroundImageFileNameProperty().bind(imageSelector.fileNameProperty());
-            presentation.backgroundVideoFileNameProperty().bind(videoSelector.fileNameProperty());
+            presentation.imageFileNameProperty().bind(imageSelector.fileNameProperty());
+            presentation.videoFileNameProperty().bind(videoSelector.fileNameProperty());
         }
 
         updateSizeFields();

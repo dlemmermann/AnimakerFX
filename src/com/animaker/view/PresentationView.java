@@ -16,6 +16,9 @@ import javafx.scene.layout.BackgroundRepeat;
 import javafx.scene.layout.BackgroundSize;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
+import javafx.scene.media.MediaView;
 import javafx.scene.shape.Rectangle;
 
 import java.io.File;
@@ -29,6 +32,7 @@ public class PresentationView extends Pane {
 
     private final Project project;
     private final Presentation presentation;
+    private MediaView mediaView;
 
     public PresentationView(Project project, Presentation presentation) {
         this.project = Objects.requireNonNull(project);
@@ -40,8 +44,9 @@ public class PresentationView extends Pane {
         presentation.backgroundRepeatProperty().addListener(it -> updateBackgroundImage());
         presentation.getStylesheets().addListener((Observable it) -> updateStylesheets());
 
-        presentation.backgroundImageFileNameProperty().addListener(it -> updateBackgroundImage());
-        presentation.backgroundVideoFileNameProperty().addListener(it -> updateBackgroundVideo());
+        presentation.imageFileNameProperty().addListener(it -> updateBackgroundImage());
+        presentation.videoFileNameProperty().addListener(it -> updateBackgroundVideo());
+        presentation.infiniteLoopProperty().addListener(it -> updateBackgroundVideo());
 
         currentSlideProperty().addListener(it -> updateSlide());
 
@@ -55,6 +60,12 @@ public class PresentationView extends Pane {
         clip.widthProperty().bind(widthProperty());
         clip.heightProperty().bind(heightProperty());
         setClip(clip);
+    }
+
+    public void destroy() {
+        if (mediaView != null) {
+            mediaView.getMediaPlayer().dispose();
+        }
     }
 
     @Override
@@ -119,7 +130,7 @@ public class PresentationView extends Pane {
     }
 
     private void updateBackgroundImage() {
-        String fileName = presentation.getBackgroundImageFileName();
+        String fileName = presentation.getImageFileName();
         if (fileName != null) {
             getStyleClass().remove("empty-background-presentation");
             Project project = getProject();
@@ -142,20 +153,52 @@ public class PresentationView extends Pane {
         }
     }
 
-    private void updateBackgroundVideo() {
-        String fileName = presentation.getBackgroundImageFileName();
-        if (fileName != null) {
-
+    private synchronized void updateBackgroundVideo() {
+        if (mediaView != null) {
+            mediaView.getMediaPlayer().stop();
         }
+
+        String videoContent = presentation.getVideoFileName();
+        if (videoContent != null) {
+            try {
+                File videoFile = project.getFile(videoContent);
+                Media media = new Media(videoFile.toPath().toUri().toURL().toExternalForm());
+                MediaPlayer player = new MediaPlayer(media);
+
+                if (presentation.getInfiniteLoop()) {
+                    player.setCycleCount(MediaPlayer.INDEFINITE);
+                }
+
+                mediaView = new MediaView(player);
+                mediaView.opacityProperty().bind(presentation.videoOpacityProperty());
+                mediaView.setPreserveRatio(false);
+                mediaView.fitHeightProperty().bind(heightProperty());
+                mediaView.fitWidthProperty().bind(widthProperty());
+
+                player.play();
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        } else {
+            mediaView = null;
+        }
+
+        updateSlide();
     }
 
     private void updateSlide() {
         Slide slide = getCurrentSlide();
 
+        if (mediaView != null) {
+            getChildren().setAll(mediaView);
+        } else {
+            getChildren().clear();
+        }
+
         if (slide != null) {
             SlideView slideView = new SlideView(this, slide);
             StackPane.setAlignment(slideView, Pos.CENTER);
-            getChildren().setAll(slideView);
+            getChildren().add(slideView);
         }
     }
 

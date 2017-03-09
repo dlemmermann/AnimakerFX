@@ -383,6 +383,7 @@ public class Workbench extends StackPane {
     private void updateSlide() {
         if (presentationView != null) {
             Bindings.unbindBidirectional(presentationView.currentSlideProperty(), selectedSlideProperty());
+            presentationView.destroy();
         }
 
         Project project = getProject();

@@ -1,7 +1,9 @@
 package com.animaker.model;
 
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -14,8 +16,12 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
-@XmlRootElement(name="presentation")
-@XmlType(propOrder = {"layout", "width", "height", "slides", "backgroundImageFileName", "backgroundVideoFileName", "backgroundRepeat"})
+@XmlRootElement(name = "presentation")
+@XmlType(propOrder = {
+        "layout", "width", "height", "slides", "imageFileName",
+        "videoFileName", "backgroundRepeat", "infiniteLoop",
+        "videoOpacity"
+})
 public class Presentation extends ModelObject {
 
     public enum Layout {
@@ -99,34 +105,34 @@ public class Presentation extends ModelObject {
 
     // background image support
 
-    private final StringProperty backgroundImageFileName = new SimpleStringProperty(this, "backgroundImageFileName");
+    private final StringProperty imageFileName = new SimpleStringProperty(this, "imageFileName");
 
-    public final StringProperty backgroundImageFileNameProperty() {
-        return backgroundImageFileName;
+    public final StringProperty imageFileNameProperty() {
+        return imageFileName;
     }
 
-    public final String getBackgroundImageFileName() {
-        return backgroundImageFileName.get();
+    public final String getImageFileName() {
+        return imageFileName.get();
     }
 
-    public final void setBackgroundImageFileName(String fileName) {
-        this.backgroundImageFileName.set(fileName);
+    public final void setImageFileName(String fileName) {
+        this.imageFileName.set(fileName);
     }
 
     // background video support
 
-    private final StringProperty backgroundVideoFileName = new SimpleStringProperty(this, "backgroundVideoFileName");
+    private final StringProperty videoFileName = new SimpleStringProperty(this, "videoFileName");
 
-    public final StringProperty backgroundVideoFileNameProperty() {
-        return backgroundVideoFileName;
+    public final StringProperty videoFileNameProperty() {
+        return videoFileName;
     }
 
-    public final String getBackgroundVideoFileName() {
-        return backgroundVideoFileName.get();
+    public final String getVideoFileName() {
+        return videoFileName.get();
     }
 
-    public final void setBackgroundVideoFileName(String fileName) {
-        this.backgroundVideoFileName.set(fileName);
+    public final void setVideoFileName(String fileName) {
+        this.videoFileName.set(fileName);
     }
 
     // background repeat
@@ -143,5 +149,37 @@ public class Presentation extends ModelObject {
 
     public final BackgroundRepeat getBackgroundRepeat() {
         return backgroundRepeat.get();
+    }
+
+    // video looping
+
+    private final BooleanProperty infiniteLoop = new SimpleBooleanProperty(this, "infiniteLoop");
+
+    public final BooleanProperty infiniteLoopProperty() {
+        return infiniteLoop;
+    }
+
+    public final void setInfiniteLoop(boolean infiniteLoop) {
+        this.infiniteLoop.set(infiniteLoop);
+    }
+
+    public final boolean getInfiniteLoop() {
+        return infiniteLoop.get();
+    }
+
+    // video opacity
+
+    private final DoubleProperty videoOpacity = new SimpleDoubleProperty(this, "videoOpacity", 1);
+
+    public final DoubleProperty videoOpacityProperty() {
+        return videoOpacity;
+    }
+
+    public final void setVideoOpacity(double videoOpacity) {
+        this.videoOpacity.set(videoOpacity);
+    }
+
+    public final double getVideoOpacity() {
+        return videoOpacity.get();
     }
 }
