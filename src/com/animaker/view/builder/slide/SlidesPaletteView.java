@@ -1,8 +1,9 @@
-package com.animaker.view.builder;
+package com.animaker.view.builder.slide;
 
 import com.animaker.model.Presentation;
 import com.animaker.model.Slide;
 import com.animaker.model.Project;
+import com.animaker.view.builder.Workbench;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.utils.FontAwesomeIconFactory;
 import javafx.beans.property.ObjectProperty;

@@ -4,6 +4,8 @@ import com.animaker.model.transition.Transition;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.geometry.Pos;
+import javafx.geometry.Side;
 
 import javax.xml.bind.annotation.XmlType;
 
@@ -134,6 +136,99 @@ public class Layer extends ModelObject {
 
     public final boolean isEnableOpeningTransitions() {
         return enableOpeningTransitions.get();
+    }
+
+    // layoutStrategy support
+
+    public enum LayoutStrategy {
+        ABSOLUTE,
+        SIDES,
+        POSITION,
+    }
+
+    private final ObjectProperty<LayoutStrategy> layoutStrategy = new SimpleObjectProperty<>(this, "layoutStrategy", LayoutStrategy.ABSOLUTE);
+
+    public final ObjectProperty<LayoutStrategy> layoutStrategyProperty() {
+        return layoutStrategy;
+    }
+
+    public final void setLayoutStrategy(LayoutStrategy layoutStrategy) {
+        this.layoutStrategy.set(layoutStrategy);
+    }
+
+    public final LayoutStrategy getLayoutStrategy() {
+        return layoutStrategy.get();
+    }
+
+    // slots support
+
+    public enum Side {
+        TOP,
+        LEFT,
+        RIGHT,
+        BOTTOM
+    }
+
+    private final ObjectProperty<Side> side = new SimpleObjectProperty<>(this, "side", Side.TOP);
+
+    public final ObjectProperty<Side> sideProperty() {
+        return side;
+    }
+
+    public final void setSide(Side side) {
+        this.side.set(side);
+    }
+
+    public final Side getSide() {
+        return side.get();
+    }
+
+    // position support
+
+    private final ObjectProperty<Pos> position = new SimpleObjectProperty<>(this, "position", Pos.CENTER);
+
+    public final ObjectProperty<Pos> positionProperty() {
+        return position;
+    }
+
+    public final void setPosition(Pos position) {
+        this.position.set(position);
+    }
+
+    public final Pos getPosition() {
+        return position.get();
+    }
+
+    // layoutStrategy x support
+
+    private final DoubleProperty layoutX = new SimpleDoubleProperty(this, "layoutX", 0);
+
+    public final DoubleProperty layoutXProperty() {
+        return layoutX;
+    }
+
+    public final void setLayoutX(double x) {
+        this.layoutX.set(x);
+    }
+
+    public final double getLayoutX() {
+        return layoutX.get();
+    }
+
+    // layoutStrategy y support
+
+    private final DoubleProperty layoutY = new SimpleDoubleProperty(this, "layoutY", 0);
+
+    public final DoubleProperty layoutYProperty() {
+        return layoutY;
+    }
+
+    public final void setLayoutY(double y) {
+        this.layoutY.set(y);
+    }
+
+    public final double getLayoutY() {
+        return layoutY.get();
     }
 
     // type support

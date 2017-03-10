@@ -52,7 +52,7 @@ public class PresentationSettingsView extends HBox {
 
         videoSelector = new FileSelectionField();
 
-        Label layoutLabel = new Label("Layout:");
+        Label layoutLabel = new Label("LayoutStrategy:");
         Label widthLabel = new Label("Width:");
         Label heightLabel = new Label("Height:");
         Label imageLabel = new Label("Image:");

@@ -1,7 +1,7 @@
 .root {
     -fx-base: rgba(60, 63, 65, 255);
     -fx-font-family: Arial;
-    -fx-font-size: 12px;
+    -fx-font-size: 11px;
     -fx-font-weight: bold;
     -fx-font-smoothing-type: lcd;
     -fx-focus-color: derive(-emphasize, 40%);
@@ -15,7 +15,7 @@
     -fx-border-width: 1 0 0 0;
 }
 
-.field-label {
+.label {
     -fx-text-fill: white;
 }
 
@@ -30,6 +30,10 @@
 
 .split-pane:horizontal .split-pane-divider {
     -fx-border-width: 0 .5 0 .5;
+}
+
+.palette {
+    -fx-background-color: -fx-base;
 }
 
 .palette .list-cell:odd,
@@ -127,11 +131,12 @@
     -fx-background-color: red;
 }
 
-.layer {
+.layer:pressed {
     -fx-border-color: red;
     -fx-border-style: dashed;
     -fx-border-width: 2;
     -fx-stroke-dash-array: 4;
+    -fx-effect: dropshadow(gaussian, black, 128, 0, 6, 6);
 }
 
 .presentation-wrapper {

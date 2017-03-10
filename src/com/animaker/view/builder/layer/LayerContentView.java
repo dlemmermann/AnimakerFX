@@ -1,9 +1,12 @@
-package com.animaker.view.builder;
+package com.animaker.view.builder.layer;
 
 import com.animaker.model.Layer;
 import com.animaker.model.Layer.LayerType;
 import com.animaker.model.Project;
+import com.animaker.view.builder.Workbench;
 import javafx.beans.InvalidationListener;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -13,14 +16,14 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
 import javafx.stage.FileChooser;
 
 import java.io.File;
-import java.nio.file.Files;
-import java.nio.file.Path;
 
-public class LayerContentView extends LayerControlBase {
+public class LayerContentView extends StackPane {
 
+    private Workbench workbench;
     private Node textSettingsView;
     private ImageSettingsView imageSettingsView;
     private Node videoSettingsView;
@@ -30,7 +33,7 @@ public class LayerContentView extends LayerControlBase {
     private TextArea textLayerText;
 
     public LayerContentView(Workbench workbench) {
-        super(workbench);
+        this.workbench = workbench;
 
         textSettingsView = createTextSettings();
         videoSettingsView = createVideoSettings();
@@ -50,6 +53,24 @@ public class LayerContentView extends LayerControlBase {
         getChildren().setAll(textSettingsView, imageSettingsView, videoSettingsView, codeSettingsView, fxmlSettingsView);
 
         showSettingsView();
+    }
+
+    private final ObjectProperty<Layer> layer = new SimpleObjectProperty<>(this, "layer");
+
+    public final ObjectProperty<Layer> layerProperty() {
+        return layer;
+    }
+
+    public final Layer getLayer() {
+        return layer.get();
+    }
+
+    public final void setLayer(Layer layer) {
+        this.layer.set(layer);
+    }
+
+    public final Project getProject() {
+        return workbench.getProject();
     }
 
     final InvalidationListener showSettingsListener = it -> showSettingsView();

@@ -1,7 +1,8 @@
-package com.animaker.view.builder;
+package com.animaker.view.builder.slide;
 
 import com.animaker.model.Slide;
 import com.animaker.model.Project;
+import com.animaker.view.builder.Workbench;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.layout.StackPane;

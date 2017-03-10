@@ -27,6 +27,9 @@ public class LayerView extends StackPane {
     private SlideView slideView;
     private final Layer layer;
 
+    private double mouseX;
+    private double mouseY;
+
     public LayerView(SlideView slideView, Layer layer) {
         this.slideView = slideView;
         this.layer = layer;
@@ -36,6 +39,9 @@ public class LayerView extends StackPane {
         visibleProperty().bind(layer.visibleProperty());
 
         setFocusTraversable(true);
+
+        layoutXProperty().bindBidirectional(layer.layoutXProperty());
+        layoutYProperty().bindBidirectional(layer.layoutYProperty());
 
         layer.typeProperty().addListener(it -> buildView());
         buildView();
@@ -107,6 +113,8 @@ public class LayerView extends StackPane {
         }
 
         if (node != null) {
+            node.styleProperty().bindBidirectional(layer.styleProperty());
+            node.setMouseTransparent(true);
             getChildren().add(node);
         }
     }

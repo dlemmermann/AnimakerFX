@@ -1,6 +1,9 @@
-package com.animaker.view.builder;
+package com.animaker.view.builder.layer;
 
+import com.animaker.model.Layer;
+import com.animaker.view.builder.Workbench;
 import javafx.geometry.Insets;
+import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
@@ -12,13 +15,18 @@ import java.util.Objects;
 /**
  * Created by lemmi on 20.12.16.
  */
-public class TransitionSettingsView extends LayerControlBase {
+public class TransitionSettingsView extends LayerSettingsBase {
+
+    private String title;
 
     public TransitionSettingsView(Workbench workbench, String title) {
         super(workbench);
 
-        Objects.requireNonNull(title);
+        this.title = Objects.requireNonNull(title);
+    }
 
+    @Override
+    protected Node createContent() {
         Label titleLabel = new Label(title);
         titleLabel.setStyle("-fx-font-weight: bold;");
         titleLabel.setMaxWidth(Double.MAX_VALUE);
@@ -34,6 +42,10 @@ public class TransitionSettingsView extends LayerControlBase {
         borderPane.setTop(header);
         BorderPane.setMargin(header, new Insets(10));
 
-        getChildren().setAll(borderPane);
+        return borderPane;
+    }
+
+    @Override
+    protected void updateView(Layer oldLayer, Layer newLayer) {
     }
 }

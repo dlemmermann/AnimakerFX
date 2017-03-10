@@ -1,5 +1,7 @@
-package com.animaker.view.builder;
+package com.animaker.view.builder.layer;
 
+import com.animaker.model.Layer;
+import com.animaker.view.builder.Workbench;
 import javafx.geometry.Orientation;
 import javafx.scene.control.Separator;
 import javafx.scene.layout.HBox;
@@ -8,7 +10,7 @@ import javafx.scene.layout.Priority;
 /**
  * Created by lemmi on 20.12.16.
  */
-public class LayerTransitionsView extends LayerControlBase {
+public class LayerTransitionsView extends LayerSettingsBase {
 
     public LayerTransitionsView(Workbench workbench) {
         super(workbench);
@@ -40,5 +42,10 @@ public class LayerTransitionsView extends LayerControlBase {
                 parallaxTransition);
 
         getChildren().setAll(hBox);
+    }
+
+    @Override
+    protected void updateView(Layer oldLayer, Layer newLayer) {
+
     }
 }

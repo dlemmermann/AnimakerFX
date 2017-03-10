@@ -4,8 +4,12 @@ import com.animaker.model.Layer;
 import com.animaker.model.Presentation;
 import com.animaker.model.Project;
 import com.animaker.model.Slide;
+import com.animaker.view.LayerView;
 import com.animaker.view.PresentationView;
 import com.animaker.view.PresentationView.Status;
+import com.animaker.view.builder.layer.LayerSettingsTabPane;
+import com.animaker.view.builder.layer.LayersPaletteView;
+import com.animaker.view.builder.slide.SlidesPaletteView;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.ObjectProperty;
@@ -23,6 +27,7 @@ import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.ToolBar;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.input.KeyCombination;
+import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Priority;
@@ -51,11 +56,13 @@ public class Workbench extends StackPane {
     public static final String PREF_KEY = "last.animation.project";
     public static final String PREF_SEPARATOR = "!";
 
-    private PropertySheet propertySheet;
+    //private PropertySheet propertySheet;
     private SlidesPaletteView slidesPaletteView;
     private LayersPaletteView layersPaletteView;
     private PresentationView presentationView;
     private MasterDetailPane presentationMasterDetailPane;
+    private LayerSettingsTabPane layerSettingsView;
+
     private Button playSlide;
 
     public Workbench() {
@@ -65,14 +72,16 @@ public class Workbench extends StackPane {
 
         MenuBar menuBar = createMenuBar();
 
-        propertySheet = new PropertySheet();
+//        propertySheet = new PropertySheet();
         slidesPaletteView = new SlidesPaletteView(this);
         slidesPaletteView.setPrefHeight(200);
         layersPaletteView = new LayersPaletteView(this);
+        layerSettingsView = new LayerSettingsTabPane(this);
 
         presentationMasterDetailPane = new MasterDetailPane();
         presentationMasterDetailPane.setDetailSide(Side.BOTTOM);
         presentationMasterDetailPane.setDividerPosition(.7);
+        presentationMasterDetailPane.setDetailNode(layerSettingsView);
 
         MasterDetailPane leftHandSide = new MasterDetailPane();
         leftHandSide.setDetailSide(Side.TOP);
@@ -82,7 +91,8 @@ public class Workbench extends StackPane {
 
         MasterDetailPane rightHandSide = new MasterDetailPane();
         rightHandSide.setDetailSide(Side.RIGHT);
-        rightHandSide.setDetailNode(propertySheet);
+        //rightHandSide.setDetailNode(propertySheet);
+        rightHandSide.setShowDetailNode(false);
         rightHandSide.setMasterNode(presentationMasterDetailPane);
 
         MasterDetailPane centerPane = new MasterDetailPane();
@@ -125,15 +135,15 @@ public class Workbench extends StackPane {
         selectedSlideProperty().addListener(it -> {
             Slide slide = getSelectedSlide();
             if (slide != null) {
-                propertySheet.getItems().setAll(BeanPropertyUtils.getProperties(getSelectedSlide()));
+               // propertySheet.getItems().setAll(BeanPropertyUtils.getProperties(getSelectedSlide()));
             }
         });
 
         selectedLayerProperty().addListener(it -> {
             Layer layer = getSelectedLayer();
             if (layer != null) {
-                propertySheet.getItems().
-                        setAll(BeanPropertyUtils.getProperties(getSelectedLayer()));
+//                propertySheet.getItems().
+//                        setAll(BeanPropertyUtils.getProperties(getSelectedLayer()));
             }
         });
 
@@ -394,7 +404,10 @@ public class Workbench extends StackPane {
         }
 
         presentationView = new PresentationView(project, presentation);
-        presentationView.addEventFilter(MouseEvent.MOUSE_CLICKED, evt -> propertySheet.getItems().setAll(BeanPropertyUtils.getProperties(getPresentation())));
+
+        installHandlers(presentationView);
+
+        //presentationView.addEventFilter(MouseEvent.MOUSE_CLICKED, evt -> propertySheet.getItems().setAll(BeanPropertyUtils.getProperties(getPresentation())));
         Bindings.bindBidirectional(presentationView.currentSlideProperty(), selectedSlideProperty());
 
         presentationView.statusProperty().addListener(it -> {
@@ -432,5 +445,34 @@ public class Workbench extends StackPane {
                 presentationMasterDetailPane.setMasterNode(scrollPane);
                 break;
         }
+    }
+
+    private double mouseX, mouseY;
+
+    private void installHandlers(PresentationView presentationView) {
+
+        presentationView.addEventFilter(MouseEvent.MOUSE_PRESSED, evt -> {
+            if (evt.getClickCount() == 1 && evt.getButton().equals(MouseButton.PRIMARY)) {
+                Object object = evt.getTarget();
+                if (object instanceof LayerView) {
+                    LayerView view = (LayerView) object;
+                    setSelectedLayer(view.getLayer());
+                    mouseX = evt.getSceneX() ;
+                    mouseY = evt.getSceneY() ;
+                }
+            }
+        });
+
+        presentationView.addEventFilter(MouseEvent.MOUSE_DRAGGED, evt -> {
+            Object object = evt.getTarget();
+            if (object instanceof LayerView) {
+                LayerView view = (LayerView) object;
+                double deltaX = evt.getSceneX() - mouseX ;
+                double deltaY = evt.getSceneY() - mouseY ;
+                view.relocate(view.getLayoutX() + deltaX, view.getLayoutY() + deltaY);
+                mouseX = evt.getSceneX() ;
+                mouseY = evt.getSceneY() ;
+            }
+        });
     }
 }

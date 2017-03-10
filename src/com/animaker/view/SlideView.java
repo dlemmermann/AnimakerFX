@@ -8,6 +8,7 @@ import javafx.beans.Observable;
 import javafx.concurrent.Worker;
 import javafx.scene.Parent;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 
 import java.util.ArrayList;
@@ -18,7 +19,7 @@ import java.util.stream.Collectors;
 /**
  * Created by lemmi on 19.12.16.
  */
-public class SlideView extends StackPane {
+public class SlideView extends Pane {
 
     private final PresentationView presentationView;
     private final Slide slide;

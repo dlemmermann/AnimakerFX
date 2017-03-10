@@ -1,8 +1,10 @@
-package com.animaker.view.builder;
+package com.animaker.view.builder.layer;
 
 import com.animaker.model.Layer;
 import com.animaker.model.Layer.LayerType;
 import com.animaker.model.Slide;
+import com.animaker.view.builder.slide.SlideControlBase;
+import com.animaker.view.builder.Workbench;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.utils.FontAwesomeIconFactory;
 import javafx.beans.InvalidationListener;
@@ -48,7 +50,17 @@ public class LayersPaletteView extends SlideControlBase {
         listView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         listView.setCellFactory(listView -> new LayerCell());
         listView.setFocusTraversable(false);
-        listView.getSelectionModel().selectedItemProperty().addListener(it -> setSelectedLayer(listView.getSelectionModel().getSelectedItem()));
+        listView.getSelectionModel().selectedItemProperty()
+                .addListener(it -> setSelectedLayer(listView.getSelectionModel().getSelectedItem()));
+
+        workbench.selectedLayerProperty().addListener(it -> {
+            Layer layer = workbench.getSelectedLayer();
+            if (layer != null) {
+                listView.getSelectionModel().select(layer);
+                listView.scrollTo(layer);
+            }
+        });
+
 
         HBox hbox = new HBox();
         hbox.setFillHeight(true);
