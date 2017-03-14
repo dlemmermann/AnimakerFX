@@ -1,6 +1,6 @@
 package com.animaker.model.transition;
 
-import com.animaker.view.LayerView;
+import com.animaker.view.ElementView;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
@@ -33,16 +33,16 @@ public class Rotate extends Transition {
     }
 
     @Override
-    public void setup(LayerView layerView) {
-        layerView.setRotate(layerView.getLayer().getRotation());
+    public void setup(ElementView elementView) {
+        elementView.setRotate(elementView.getElement().getRotation());
     }
 
     @Override
-    public void configure(LayerView layerView, Timeline timeline) {
+    public void configure(ElementView elementView, Timeline timeline) {
         timeline.getKeyFrames().addAll(
                 new KeyFrame(getDelay(),
-                        new KeyValue(layerView.rotateProperty(), layerView.getLayer().getRotation(), getInterpolator())),
+                        new KeyValue(elementView.rotateProperty(), elementView.getElement().getRotation(), getInterpolator())),
                 new KeyFrame(getDuration().add(getDelay()),
-                        new KeyValue(layerView.rotateProperty(), getRotation(), getInterpolator())));
+                        new KeyValue(elementView.rotateProperty(), getRotation(), getInterpolator())));
     }
 }

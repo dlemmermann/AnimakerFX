@@ -1,40 +1,79 @@
 package com.animaker.model;
 
+import com.animaker.model.elements.CodeElement;
+import com.animaker.model.elements.FXMLElement;
+import com.animaker.model.elements.HTMLElement;
+import com.animaker.model.elements.ImageElement;
+import com.animaker.model.elements.RegionElement;
+import com.animaker.model.elements.TextElement;
+import com.animaker.model.elements.VideoElement;
 import com.animaker.model.transition.Transition;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.scene.image.Image;
+import javafx.scene.layout.BackgroundRepeat;
 
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
+import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlType;
 
-@XmlType(name="Slide")
+@XmlType(name = "Slide")
 public class Slide extends ModelObject {
 
 
     public Slide() {
     }
 
-    public Slide(String name) {
-        super(name);
-    }
-
     // image content support
 
-    private final ObjectProperty<Image> backgroundImage = new SimpleObjectProperty<>(this, "backgroundImage");
+    private final StringProperty backgroundImageFileName = new SimpleStringProperty(this, "backgroundImageFileName");
 
-    public final ObjectProperty backgroundImageProperty() {
-        return backgroundImage;
+    public final StringProperty backgroundImageFileNameProperty() {
+        return backgroundImageFileName;
     }
 
-    public final Image getBackgroundImage() {
-        return backgroundImage.get();
+    public final String getBackgroundImageFileName() {
+        return backgroundImageFileName.get();
     }
 
-    public final void setBackgroundImage(Image content) {
-        this.backgroundImage.set(content);
+    public final void setBackgroundImageFileName(String fileName) {
+        this.backgroundImageFileName.set(fileName);
+    }
+
+    // repeat x support
+
+    private ObjectProperty<BackgroundRepeat> repeatX = new SimpleObjectProperty<>(this, "repeat-x", BackgroundRepeat.NO_REPEAT);
+
+    public final ObjectProperty<BackgroundRepeat> repeatXProperty() {
+        return repeatX;
+    }
+
+    public final BackgroundRepeat getRepeatX() {
+        return repeatX.get();
+    }
+
+    public void setRepeatX(BackgroundRepeat repeat) {
+        this.repeatX.set(repeat);
+    }
+
+    // repeat y support
+
+    private ObjectProperty<BackgroundRepeat> repeatY = new SimpleObjectProperty<>(this, "repeat-y", BackgroundRepeat.NO_REPEAT);
+
+    public final ObjectProperty<BackgroundRepeat> repeatYProperty() {
+        return repeatY;
+    }
+
+    public final BackgroundRepeat getRepeatY() {
+        return repeatY.get();
+    }
+
+    public void setRepeatY(BackgroundRepeat repeat) {
+        this.repeatY.set(repeat);
     }
 
     // transition support
@@ -53,12 +92,21 @@ public class Slide extends ModelObject {
         return transition.get();
     }
 
-    // layers support
+    // elements support
 
-    private ObservableList<Layer> layers = FXCollections.observableArrayList();
+    private ObservableList<Element> elements = FXCollections.observableArrayList();
 
-    @XmlElement(name = "layer")
-    public final ObservableList<Layer> getLayers() {
-        return layers;
+    @XmlElementWrapper(name = "elements")
+    @XmlElements({
+            @XmlElement(name = "code", type = CodeElement.class),
+            @XmlElement(name = "fxml", type = FXMLElement.class),
+            @XmlElement(name = "html", type = HTMLElement.class),
+            @XmlElement(name = "image", type = ImageElement.class),
+            @XmlElement(name = "region", type = RegionElement.class),
+            @XmlElement(name = "text", type = TextElement.class),
+            @XmlElement(name = "video", type = VideoElement.class)
+    })
+    public final ObservableList<Element> getElements() {
+        return elements;
     }
 }

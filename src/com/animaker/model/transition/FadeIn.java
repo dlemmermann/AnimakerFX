@@ -1,6 +1,6 @@
 package com.animaker.model.transition;
 
-import com.animaker.view.LayerView;
+import com.animaker.view.ElementView;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
@@ -63,20 +63,20 @@ public class FadeIn extends Transition {
     }
 
     @Override
-    public void setup(LayerView layerView) {
-        layerView.setOpacity(0);
+    public void setup(ElementView elementView) {
+        elementView.setOpacity(0);
     }
 
     @Override
-    public void configure(LayerView layerView, Timeline timeline) {
+    public void configure(ElementView elementView, Timeline timeline) {
         /*
-         * Interpolate from the current opacity used by the layer view to the
-         * target opacity defined my the layer model.
+         * Interpolate from the current opacity used by the element view to the
+         * target opacity defined my the element model.
          */
         timeline.getKeyFrames().addAll(
                 new KeyFrame(getDelay(),
-                        new KeyValue(layerView.opacityProperty(), layerView.getOpacity(), getInterpolator())),
+                        new KeyValue(elementView.opacityProperty(), elementView.getOpacity(), getInterpolator())),
                 new KeyFrame(getDuration().add(getDelay()),
-                        new KeyValue(layerView.opacityProperty(), layerView.getLayer().getOpacity(), getInterpolator())));
+                        new KeyValue(elementView.opacityProperty(), elementView.getElement().getOpacity(), getInterpolator())));
     }
 }

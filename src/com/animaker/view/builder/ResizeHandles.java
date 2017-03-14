@@ -1,7 +1,7 @@
 package com.animaker.view.builder;
 
-import com.animaker.model.Layer;
-import com.animaker.view.LayerView;
+import com.animaker.model.Element;
+import com.animaker.view.ElementView;
 import javafx.geometry.Pos;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
@@ -11,7 +11,7 @@ import javafx.scene.layout.StackPane;
  */
 public class ResizeHandles extends StackPane {
 
-    private final LayerView layerView;
+    private final ElementView elementView;
 
     private enum ResizeMode {
         RESIZE_W(Pos.CENTER_LEFT),
@@ -34,15 +34,15 @@ public class ResizeHandles extends StackPane {
         }
     }
 
-    public ResizeHandles(LayerView layerView) {
-        this.layerView = layerView;
+    public ResizeHandles(ElementView elementView) {
+        this.elementView = elementView;
 
-        Layer layer = layerView.getLayer();
+        Element element = elementView.getElement();
 
-        layoutXProperty().bind(layer.layoutXProperty());
-        layoutYProperty().bind(layer.layoutYProperty());
-        prefWidthProperty().bind(layer.widthProperty());
-        prefHeightProperty().bind(layer.heightProperty());
+        layoutXProperty().bind(element.layoutXProperty());
+        layoutYProperty().bind(element.layoutYProperty());
+        prefWidthProperty().bind(element.widthProperty());
+        prefHeightProperty().bind(element.heightProperty());
 
         for (ResizeMode mode : ResizeMode.values()) {
             ResizeHandle handle = new ResizeHandle(mode);
@@ -51,8 +51,8 @@ public class ResizeHandles extends StackPane {
         }
     }
 
-    public LayerView getLayerView() {
-        return layerView;
+    public ElementView getElementView() {
+        return elementView;
     }
 
     public class ResizeHandle extends Region {
@@ -75,48 +75,48 @@ public class ResizeHandles extends StackPane {
                 mouseX = evt.getSceneX();
                 mouseY = evt.getSceneY();
 
-                final Layer layer = layerView.getLayer();
+                final Element element = elementView.getElement();
 
                 System.out.println(mode);
 
                 switch (mode) {
                     case RESIZE_NW:
-                        layer.setLayoutX(layer.getLayoutX() + deltaX);
-                        layer.setLayoutY(layer.getLayoutY() + deltaY);
-                        layer.setWidth(layer.getWidth() - deltaX);
-                        layer.setHeight(layer.getHeight() - deltaY);
+                        element.setLayoutX(element.getLayoutX() + deltaX);
+                        element.setLayoutY(element.getLayoutY() + deltaY);
+                        element.setWidth(element.getWidth() - deltaX);
+                        element.setHeight(element.getHeight() - deltaY);
                         break;
                     case RESIZE_NE:
-                        layer.setLayoutY(layer.getLayoutY() + deltaY);
-                        layer.setWidth(layer.getWidth() + deltaX);
-                        layer.setHeight(layer.getHeight() - deltaY);
+                        element.setLayoutY(element.getLayoutY() + deltaY);
+                        element.setWidth(element.getWidth() + deltaX);
+                        element.setHeight(element.getHeight() - deltaY);
                         break;
                     case RESIZE_SE:
-                        layer.setWidth(layer.getWidth() + deltaX);
-                        layer.setHeight(layer.getHeight() + deltaY);
+                        element.setWidth(element.getWidth() + deltaX);
+                        element.setHeight(element.getHeight() + deltaY);
                         break;
                     case RESIZE_SW:
-                        layer.setLayoutX(layer.getLayoutX() + deltaX);
-                        layer.setWidth(layer.getWidth() - deltaX);
-                        layer.setHeight(layer.getHeight() + deltaY);
+                        element.setLayoutX(element.getLayoutX() + deltaX);
+                        element.setWidth(element.getWidth() - deltaX);
+                        element.setHeight(element.getHeight() + deltaY);
                         break;
                     case RESIZE_N:
-                        layer.setLayoutY(layer.getLayoutY() + deltaY);
-                        layer.setHeight(layer.getHeight() - deltaY);
+                        element.setLayoutY(element.getLayoutY() + deltaY);
+                        element.setHeight(element.getHeight() - deltaY);
                         break;
                     case RESIZE_W:
-                        layer.setLayoutX(layer.getLayoutX() + deltaX);
-                        layer.setWidth(layer.getWidth() - deltaX);
+                        element.setLayoutX(element.getLayoutX() + deltaX);
+                        element.setWidth(element.getWidth() - deltaX);
                         break;
                     case RESIZE_E:
-                        layer.setWidth(layer.getWidth() + deltaX);
+                        element.setWidth(element.getWidth() + deltaX);
                         break;
                     case RESIZE_S:
-                        layer.setHeight(layer.getHeight() + deltaY);
+                        element.setHeight(element.getHeight() + deltaY);
                         break;
                 }
 
-                layerView.getPresentationView().requestLayout();
+                elementView.getPresentationView().requestLayout();
             });
         }
     }

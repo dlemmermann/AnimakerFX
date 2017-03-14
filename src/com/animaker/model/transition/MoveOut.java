@@ -1,6 +1,6 @@
 package com.animaker.model.transition;
 
-import com.animaker.view.LayerView;
+import com.animaker.view.ElementView;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
@@ -61,23 +61,23 @@ public class MoveOut extends Transition {
     }
 
     @Override
-    public void setup(LayerView layerView) {
-        layerView.setTranslateX(getOffScreenX(layerView));
-        layerView.setTranslateY(getOffScreenY(layerView));
+    public void setup(ElementView elementView) {
+        elementView.setTranslateX(getOffScreenX(elementView));
+        elementView.setTranslateY(getOffScreenY(elementView));
     }
 
     @Override
-    public void configure(LayerView layerView, Timeline timeline) {
-        KeyValue xValue1 = new KeyValue(layerView.translateXProperty(), 0, getInterpolator());
-        KeyValue yValue1 = new KeyValue(layerView.translateYProperty(), 0, getInterpolator());
-        KeyValue xValue2 = new KeyValue(layerView.translateXProperty(), getOffScreenX(layerView), getInterpolator());
-        KeyValue yValue2 = new KeyValue(layerView.translateYProperty(), getOffScreenY(layerView), getInterpolator());
+    public void configure(ElementView elementView, Timeline timeline) {
+        KeyValue xValue1 = new KeyValue(elementView.translateXProperty(), 0, getInterpolator());
+        KeyValue yValue1 = new KeyValue(elementView.translateYProperty(), 0, getInterpolator());
+        KeyValue xValue2 = new KeyValue(elementView.translateXProperty(), getOffScreenX(elementView), getInterpolator());
+        KeyValue yValue2 = new KeyValue(elementView.translateYProperty(), getOffScreenY(elementView), getInterpolator());
         KeyFrame frame1 = new KeyFrame(getDelay(), xValue1, yValue1);
         KeyFrame frame2 = new KeyFrame(getDuration().add(getDelay()), xValue2, yValue2);
         timeline.getKeyFrames().addAll(frame1, frame2);
     }
 
-    private double getOffScreenX(LayerView view) {
+    private double getOffScreenX(ElementView view) {
         switch (getDirection()) {
             case LEFT_TO_RIGHT:
             case TOP_LEFT_TO_BOTTOM_RIGHT:
@@ -94,7 +94,7 @@ public class MoveOut extends Transition {
         }
     }
 
-    private double getOffScreenY(LayerView view) {
+    private double getOffScreenY(ElementView view) {
         switch (getDirection()) {
             case TOP_LEFT_TO_BOTTOM_RIGHT:
             case TOP_RIGHT_TO_BOTTOM_LEFT:

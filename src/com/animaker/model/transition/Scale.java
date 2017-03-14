@@ -1,6 +1,6 @@
 package com.animaker.model.transition;
 
-import com.animaker.view.LayerView;
+import com.animaker.view.ElementView;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
@@ -74,16 +74,16 @@ public class Scale extends Transition {
     // rotation
 
     @Override
-    public void setup(LayerView layerView) {
-        layerView.setScaleX(layerView.getLayer().getScaleX());
-        layerView.setScaleY(layerView.getLayer().getScaleY());
+    public void setup(ElementView elementView) {
+        elementView.setScaleX(elementView.getElement().getScaleX());
+        elementView.setScaleY(elementView.getElement().getScaleY());
     }
 
     @Override
-    public void configure(LayerView layerView, Timeline timeline) {
+    public void configure(ElementView elementView, Timeline timeline) {
         timeline.getKeyFrames().add(
                 new KeyFrame(getDuration().add(getDelay()),
-                        new KeyValue(layerView.scaleXProperty(),  getScaleX(), getInterpolator()),
-                        new KeyValue(layerView.scaleYProperty(),  getScaleY(), getInterpolator())));
+                        new KeyValue(elementView.scaleXProperty(),  getScaleX(), getInterpolator()),
+                        new KeyValue(elementView.scaleYProperty(),  getScaleY(), getInterpolator())));
     }
 }

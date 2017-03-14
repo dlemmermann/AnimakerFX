@@ -41,7 +41,8 @@ public class PresentationView extends Pane {
         getStyleClass().add("presentation");
 
         presentation.layoutProperty().addListener(it -> updateSize());
-        presentation.backgroundRepeatProperty().addListener(it -> updateBackgroundImage());
+        presentation.repeatXProperty().addListener(it -> updateBackgroundImage());
+        presentation.repeatYProperty().addListener(it -> updateBackgroundImage());
         presentation.getStylesheets().addListener((Observable it) -> updateStylesheets());
 
         presentation.imageFileNameProperty().addListener(it -> updateBackgroundImage());
@@ -146,12 +147,15 @@ public class PresentationView extends Pane {
             try (FileInputStream in = new FileInputStream(file)) {
                 final Image image = new Image(in);
                 final Presentation presentation = getPresentation();
-                final BackgroundRepeat repeat = presentation.getBackgroundRepeat();
+                final BackgroundRepeat repeatX = presentation.getRepeatX();
+                final BackgroundRepeat repeatY = presentation.getRepeatY();
                 BackgroundSize size = BackgroundSize.DEFAULT;
-                if (repeat.equals(BackgroundRepeat.NO_REPEAT)) {
-                    size = new BackgroundSize(100, 1000, true, true, false, true);
+
+                // TODO: how does "size" work?
+                if (repeatX.equals(BackgroundRepeat.NO_REPEAT)) {
+                    size = new BackgroundSize(100, 100, true, true, false, true);
                 }
-                final BackgroundImage backgroundImage = new BackgroundImage(image, repeat, repeat, BackgroundPosition.CENTER, size);
+                final BackgroundImage backgroundImage = new BackgroundImage(image, repeatX, repeatY, BackgroundPosition.CENTER, size);
                 setBackground(new Background(backgroundImage));
             } catch (Exception ex) {
                 ex.printStackTrace();

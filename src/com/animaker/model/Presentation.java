@@ -17,9 +17,9 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
 @XmlRootElement(name = "presentation")
-@XmlType(propOrder = {
+@XmlType(namespace = "com.dlsc.animation", propOrder = {
         "layout", "width", "height", "slides", "imageFileName",
-        "videoFileName", "backgroundRepeat", "infiniteLoop",
+        "videoFileName", "repeatX", "repeatY", "infiniteLoop",
         "videoOpacity"
 })
 public class Presentation extends ModelObject {
@@ -32,10 +32,6 @@ public class Presentation extends ModelObject {
     }
 
     public Presentation() {
-    }
-
-    public Presentation(String name) {
-        super(name);
     }
 
     // stylesheet support
@@ -135,20 +131,36 @@ public class Presentation extends ModelObject {
         this.videoFileName.set(fileName);
     }
 
-    // background repeat
+    // repeat x support
 
-    private final ObjectProperty<BackgroundRepeat> backgroundRepeat = new SimpleObjectProperty<>(this, "backgroundRepeat", BackgroundRepeat.NO_REPEAT);
+    private ObjectProperty<BackgroundRepeat> repeatX = new SimpleObjectProperty<>(this, "repeat-x", BackgroundRepeat.NO_REPEAT);
 
-    public final ObjectProperty<BackgroundRepeat> backgroundRepeatProperty() {
-        return backgroundRepeat;
+    public final ObjectProperty<BackgroundRepeat> repeatXProperty() {
+        return repeatX;
     }
 
-    public final void setBackgroundRepeat(BackgroundRepeat backgroundRepeat) {
-        this.backgroundRepeat.set(backgroundRepeat);
+    public final BackgroundRepeat getRepeatX() {
+        return repeatX.get();
     }
 
-    public final BackgroundRepeat getBackgroundRepeat() {
-        return backgroundRepeat.get();
+    public void setRepeatX(BackgroundRepeat repeat) {
+        this.repeatX.set(repeat);
+    }
+
+    // repeat y support
+
+    private ObjectProperty<BackgroundRepeat> repeatY = new SimpleObjectProperty<>(this, "repeat-y", BackgroundRepeat.NO_REPEAT);
+
+    public final ObjectProperty<BackgroundRepeat> repeatYProperty() {
+        return repeatY;
+    }
+
+    public final BackgroundRepeat getRepeatY() {
+        return repeatY.get();
+    }
+
+    public void setRepeatY(BackgroundRepeat repeat) {
+        this.repeatY.set(repeat);
     }
 
     // video looping

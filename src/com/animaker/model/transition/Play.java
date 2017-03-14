@@ -1,6 +1,6 @@
 package com.animaker.model.transition;
 
-import com.animaker.view.LayerView;
+import com.animaker.view.ElementView;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
@@ -18,17 +18,17 @@ public class Play extends Transition {
     }
 
     @Override
-    public void setup(LayerView layerView) {
-        layerView.setPlay(false);
+    public void setup(ElementView elementView) {
+        elementView.setPlay(false);
     }
 
     @Override
-    public void configure(LayerView layerView, Timeline timeline) {
+    public void configure(ElementView elementView, Timeline timeline) {
         timeline.getKeyFrames().addAll(
                 new KeyFrame(getDelay(),
-                        new KeyValue(layerView.playProperty(), true)),
+                        new KeyValue(elementView.playProperty(), true)),
                 new KeyFrame(getDuration().add(getDelay()),
-                        new KeyValue(layerView.playProperty(), false))
+                        new KeyValue(elementView.playProperty(), false))
         );
     }
 }

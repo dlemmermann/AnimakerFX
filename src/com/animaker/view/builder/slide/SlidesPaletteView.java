@@ -50,7 +50,8 @@ public class SlidesPaletteView extends StackPane {
         addSlideButton.setOnAction(evt -> {
             Presentation presentation = getPresentation();
             if (presentation != null) {
-                Slide slide = new Slide("Untitled");
+                Slide slide = new Slide();
+                slide.setName("Untitled");
                 presentation.getSlides().add(slide);
             }
         });

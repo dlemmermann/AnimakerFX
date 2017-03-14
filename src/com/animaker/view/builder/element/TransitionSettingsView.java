@@ -1,6 +1,6 @@
-package com.animaker.view.builder.layer;
+package com.animaker.view.builder.element;
 
-import com.animaker.model.Layer;
+import com.animaker.model.Element;
 import com.animaker.view.builder.Workbench;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
@@ -46,6 +46,6 @@ public class TransitionSettingsView extends LayerSettingsBase {
     }
 
     @Override
-    protected void updateView(Layer oldLayer, Layer newLayer) {
+    protected void updateView(Element oldElement, Element newElement) {
     }
 }

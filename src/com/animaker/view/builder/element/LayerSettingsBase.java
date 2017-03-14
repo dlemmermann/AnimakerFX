@@ -1,6 +1,6 @@
-package com.animaker.view.builder.layer;
+package com.animaker.view.builder.element;
 
-import com.animaker.model.Layer;
+import com.animaker.model.Element;
 import com.animaker.model.Project;
 import com.animaker.view.builder.Workbench;
 import javafx.beans.property.ObjectProperty;
@@ -17,17 +17,17 @@ public abstract class LayerSettingsBase extends StackPane {
     protected LayerSettingsBase(Workbench workbench) {
         this.workbench = workbench;
 
-        layerProperty().bindBidirectional(workbench.selectedLayerProperty());
+        layerProperty().bindBidirectional(workbench.selectedElementProperty());
 
         layerProperty().addListener((observable, oldLayer, newLayer) -> updateView(oldLayer, newLayer));
 
         Label layerName = new Label();
         layerProperty().addListener(it -> {
-            Layer layer = getLayer();
-            if (layer != null) {
-                layerName.setText(layer.getName());
+            Element element = getLayer();
+            if (element != null) {
+                layerName.setText(element.getName());
             } else {
-                layerName.setText("No layer selected...");
+                layerName.setText("No element selected...");
             }
         });
 
@@ -42,7 +42,7 @@ public abstract class LayerSettingsBase extends StackPane {
         return new Label("Missing content. Not implemented, yet.");
     }
 
-    protected abstract void updateView(Layer oldLayer, Layer newLayer);
+    protected abstract void updateView(Element oldElement, Element newElement);
 
     public final Workbench getWorkbench() {
         return workbench;
@@ -52,17 +52,17 @@ public abstract class LayerSettingsBase extends StackPane {
         return getWorkbench().getProject();
     }
 
-    private final ObjectProperty<Layer> layer = new SimpleObjectProperty<>(this, "layer");
+    private final ObjectProperty<Element> layer = new SimpleObjectProperty<>(this, "element");
 
-    public final ObjectProperty<Layer> layerProperty() {
+    public final ObjectProperty<Element> layerProperty() {
         return layer;
     }
 
-    public final Layer getLayer() {
+    public final Element getLayer() {
         return layer.get();
     }
 
-    public final void setLayer(Layer layer) {
-        this.layer.set(layer);
+    public final void setLayer(Element element) {
+        this.layer.set(element);
     }
 }

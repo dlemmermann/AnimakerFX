@@ -1,6 +1,6 @@
 package com.animaker.model.transition;
 
-import com.animaker.view.LayerView;
+import com.animaker.view.ElementView;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
@@ -63,20 +63,20 @@ public class FadeOut extends Transition {
     }
 
     @Override
-    public void setup(LayerView layerView) {
-        layerView.setOpacity(layerView.getLayer().getOpacity());
+    public void setup(ElementView elementView) {
+        elementView.setOpacity(elementView.getElement().getOpacity());
     }
 
     @Override
-    public void configure(LayerView layerView, Timeline timeline) {
+    public void configure(ElementView elementView, Timeline timeline) {
         /*
-         * Interpolate from the current opacity used by the layer view to the
+         * Interpolate from the current opacity used by the element view to the
          * target opacity of "0" = invisible.
          */
         timeline.getKeyFrames().addAll(
                 new KeyFrame(getDelay(),
-                        new KeyValue(layerView.opacityProperty(), layerView.getOpacity(), getInterpolator())),
+                        new KeyValue(elementView.opacityProperty(), elementView.getOpacity(), getInterpolator())),
                 new KeyFrame(getDuration().add(getDelay()),
-                        new KeyValue(layerView.opacityProperty(), 0, getInterpolator())));
+                        new KeyValue(elementView.opacityProperty(), 0, getInterpolator())));
     }
 }

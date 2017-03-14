@@ -1,8 +1,8 @@
-package com.animaker.view.builder.layer;
+package com.animaker.view.builder.element;
 
-import com.animaker.model.Layer;
-import com.animaker.model.Layer.LayoutStrategy;
-import com.animaker.model.Layer.Side;
+import com.animaker.model.Element;
+import com.animaker.model.Element.LayoutStrategy;
+import com.animaker.model.Element.Side;
 import com.animaker.view.builder.Workbench;
 import javafx.beans.binding.Bindings;
 import javafx.geometry.Pos;
@@ -60,21 +60,21 @@ public class LayerPositioningView extends LayerSettingsBase {
     }
 
     @Override
-    protected void updateView(Layer oldLayer, Layer newLayer) {
-        if (oldLayer != null) {
-            Bindings.unbindBidirectional(layoutBox.valueProperty(), oldLayer.layoutStrategyProperty());
-            Bindings.unbindBidirectional(xLayoutField.textProperty(), oldLayer.layoutXProperty());
-            Bindings.unbindBidirectional(yLayoutField.textProperty(), oldLayer.layoutYProperty());
-            Bindings.unbindBidirectional(sideBox.valueProperty(), oldLayer.sideProperty());
-            Bindings.unbindBidirectional(positionBox.valueProperty(), oldLayer.positionProperty());
+    protected void updateView(Element oldElement, Element newElement) {
+        if (oldElement != null) {
+            Bindings.unbindBidirectional(layoutBox.valueProperty(), oldElement.layoutStrategyProperty());
+            Bindings.unbindBidirectional(xLayoutField.textProperty(), oldElement.layoutXProperty());
+            Bindings.unbindBidirectional(yLayoutField.textProperty(), oldElement.layoutYProperty());
+            Bindings.unbindBidirectional(sideBox.valueProperty(), oldElement.sideProperty());
+            Bindings.unbindBidirectional(positionBox.valueProperty(), oldElement.positionProperty());
         }
 
-        if (newLayer != null) {
-            Bindings.bindBidirectional(layoutBox.valueProperty(), newLayer.layoutStrategyProperty());
-            Bindings.bindBidirectional(xLayoutField.textProperty(), newLayer.layoutXProperty(), new NumberStringConverter());
-            Bindings.bindBidirectional(yLayoutField.textProperty(), newLayer.layoutYProperty(), new NumberStringConverter());
-            Bindings.bindBidirectional(sideBox.valueProperty(), newLayer.sideProperty());
-            Bindings.bindBidirectional(positionBox.valueProperty(), newLayer.positionProperty());
+        if (newElement != null) {
+            Bindings.bindBidirectional(layoutBox.valueProperty(), newElement.layoutStrategyProperty());
+            Bindings.bindBidirectional(xLayoutField.textProperty(), newElement.layoutXProperty(), new NumberStringConverter());
+            Bindings.bindBidirectional(yLayoutField.textProperty(), newElement.layoutYProperty(), new NumberStringConverter());
+            Bindings.bindBidirectional(sideBox.valueProperty(), newElement.sideProperty());
+            Bindings.bindBidirectional(positionBox.valueProperty(), newElement.positionProperty());
         }
     }
 }

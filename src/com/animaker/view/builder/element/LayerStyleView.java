@@ -1,6 +1,6 @@
-package com.animaker.view.builder.layer;
+package com.animaker.view.builder.element;
 
-import com.animaker.model.Layer;
+import com.animaker.model.Element;
 import com.animaker.view.builder.Workbench;
 import javafx.beans.binding.Bindings;
 import javafx.geometry.Insets;
@@ -24,13 +24,13 @@ public class LayerStyleView extends LayerSettingsBase {
     }
 
     @Override
-    protected void updateView(Layer oldLayer, Layer newLayer) {
-        if (oldLayer != null) {
-            Bindings.unbindBidirectional(textArea.textProperty(), oldLayer.styleProperty());
+    protected void updateView(Element oldElement, Element newElement) {
+        if (oldElement != null) {
+            Bindings.unbindBidirectional(textArea.textProperty(), oldElement.styleProperty());
         }
 
-        if (newLayer != null) {
-            Bindings.bindBidirectional(textArea.textProperty(), newLayer.styleProperty());
+        if (newElement != null) {
+            Bindings.bindBidirectional(textArea.textProperty(), newElement.styleProperty());
         }
     }
 }

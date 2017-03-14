@@ -1,4 +1,4 @@
-package com.animaker.view.builder.layer;
+package com.animaker.view.builder.element;
 
 import com.animaker.view.builder.Workbench;
 import javafx.scene.control.Tab;

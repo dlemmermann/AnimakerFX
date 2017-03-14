@@ -29,7 +29,8 @@ public class PresentationSettingsView extends HBox {
     private TextField heightField;
     private FileSelectionField imageSelector;
     private FileSelectionField videoSelector;
-    private ComboBox<BackgroundRepeat> backgroundRepeatBox;
+    private ComboBox<BackgroundRepeat> repeatXBox;
+    private ComboBox<BackgroundRepeat> repeatYBox;
     private CheckBox videoInfiniteLoop;
     private Slider videoOpacitySlider;
 
@@ -45,8 +46,10 @@ public class PresentationSettingsView extends HBox {
         widthField = new TextField();
         heightField = new TextField();
         imageSelector = new FileSelectionField();
-        backgroundRepeatBox = new ComboBox<>();
-        backgroundRepeatBox.getItems().setAll(BackgroundRepeat.values());
+        repeatXBox = new ComboBox<>();
+        repeatXBox.getItems().setAll(BackgroundRepeat.values());
+        repeatYBox = new ComboBox<>();
+        repeatYBox.getItems().setAll(BackgroundRepeat.values());
         videoInfiniteLoop = new CheckBox();
         videoOpacitySlider = new Slider(0,1, 1);
 
@@ -69,7 +72,7 @@ public class PresentationSettingsView extends HBox {
         opacityLabel.getStyleClass().add("field-label");
 
         getChildren().setAll(layoutLabel, layoutBox, widthLabel, widthField, heightLabel, heightField,
-                imageLabel, imageSelector, backgroundRepeatBox, videoLabel, videoSelector, loopLabel, videoInfiniteLoop,
+                imageLabel, imageSelector, repeatXBox, repeatYBox, videoLabel, videoSelector, loopLabel, videoInfiniteLoop,
                 opacityLabel, videoOpacitySlider);
 
         presentationProperty().addListener(it -> updateView());
@@ -92,7 +95,8 @@ public class PresentationSettingsView extends HBox {
 
         if (presentation != null) {
             Bindings.bindBidirectional(layoutBox.valueProperty(), presentation.layoutProperty());
-            Bindings.bindBidirectional(backgroundRepeatBox.valueProperty(), presentation.backgroundRepeatProperty());
+            Bindings.bindBidirectional(repeatXBox.valueProperty(), presentation.repeatXProperty());
+            Bindings.bindBidirectional(repeatYBox.valueProperty(), presentation.repeatYProperty());
             Bindings.bindBidirectional(videoInfiniteLoop.selectedProperty(), presentation.infiniteLoopProperty());
             Bindings.bindBidirectional(videoOpacitySlider.valueProperty(), presentation.videoOpacityProperty());
             Bindings.bindBidirectional(widthField.textProperty(), presentation.widthProperty(), new NumberStringConverter());

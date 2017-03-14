@@ -11,10 +11,6 @@ public abstract class ModelObject {
     public ModelObject() {
     }
 
-    public ModelObject(String name) {
-        setName(name);
-    }
-
     // name support
 
     private final StringProperty name = new SimpleStringProperty(this, "name", "Untitled");

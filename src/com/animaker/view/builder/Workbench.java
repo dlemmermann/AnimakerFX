@@ -1,17 +1,18 @@
 package com.animaker.view.builder;
 
-import com.animaker.model.Layer;
-import com.animaker.model.Layer.LayerType;
-import com.animaker.model.Layer.LayoutStrategy;
+import com.animaker.model.Element;
+import com.animaker.model.Element.LayoutStrategy;
 import com.animaker.model.Presentation;
 import com.animaker.model.Project;
 import com.animaker.model.Slide;
-import com.animaker.view.LayerView;
+import com.animaker.model.elements.ImageElement;
+import com.animaker.model.elements.VideoElement;
+import com.animaker.view.ElementView;
 import com.animaker.view.PresentationView;
 import com.animaker.view.PresentationView.Status;
 import com.animaker.view.builder.ResizeHandles.ResizeHandle;
-import com.animaker.view.builder.layer.LayerSettingsTabPane;
-import com.animaker.view.builder.layer.LayersPaletteView;
+import com.animaker.view.builder.element.LayerSettingsTabPane;
+import com.animaker.view.builder.element.LayersPaletteView;
 import com.animaker.view.builder.slide.SlidesPaletteView;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
@@ -45,8 +46,6 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.media.Media;
-import javafx.scene.media.MediaPlayer;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import org.controlsfx.control.MasterDetailPane;
@@ -138,7 +137,7 @@ public class Workbench extends StackPane {
         layersPaletteView.slideProperty().bind(slidesPaletteView.selectedSlideProperty());
 
         Bindings.bindBidirectional(slidesPaletteView.selectedSlideProperty(), selectedSlideProperty());
-        Bindings.bindBidirectional(layersPaletteView.selectedLayerProperty(), selectedLayerProperty());
+        Bindings.bindBidirectional(layersPaletteView.selectedLayerProperty(), selectedElementProperty());
 
         selectedSlideProperty().addListener(it -> updateSlide());
 
@@ -151,11 +150,11 @@ public class Workbench extends StackPane {
             }
         });
 
-        selectedLayerProperty().addListener(it -> {
-            Layer layer = getSelectedLayer();
-            if (layer != null) {
+        selectedElementProperty().addListener(it -> {
+            Element element = getSelectedElement();
+            if (element != null) {
 //                propertySheet.getItems().
-//                        setAll(BeanPropertyUtils.getProperties(getSelectedLayer()));
+//                        setAll(BeanPropertyUtils.getProperties(getSelectedElement()));
             }
         });
 
@@ -167,9 +166,9 @@ public class Workbench extends StackPane {
 
     // resize support
 
-    public final void initResize(LayerView layerView) {
+    public final void initResize(ElementView elementView) {
         presentationView.getChildren().removeIf(child -> child instanceof ResizeHandles);
-        ResizeHandles resizeHandles = new ResizeHandles(layerView);
+        ResizeHandles resizeHandles = new ResizeHandles(elementView);
         presentationView.getChildren().add(resizeHandles);
         resizeHandles.toFront();
     }
@@ -226,20 +225,20 @@ public class Workbench extends StackPane {
         return selectedSlide.get();
     }
 
-    // selected layer support
+    // selected element support
 
-    private final ObjectProperty<Layer> selectedLayer = new SimpleObjectProperty<>(this, "selectedLayer");
+    private final ObjectProperty<Element> selectedElement = new SimpleObjectProperty<>(this, "selectedElement");
 
-    public final ObjectProperty<Layer> selectedLayerProperty() {
-        return selectedLayer;
+    public final ObjectProperty<Element> selectedElementProperty() {
+        return selectedElement;
     }
 
-    public final void setSelectedLayer(Layer layer) {
-        this.selectedLayer.set(layer);
+    public final void setSelectedElement(Element element) {
+        this.selectedElement.set(element);
     }
 
-    public final Layer getSelectedLayer() {
-        return selectedLayer.get();
+    public final Element getSelectedElement() {
+        return selectedElement.get();
     }
 
     private MenuBar createMenuBar() {
@@ -397,7 +396,8 @@ public class Workbench extends StackPane {
         dialog.setHeaderText("Add a new slide to the current presentation.");
         dialog.setContentText("Presentation Name:");
         dialog.showAndWait().ifPresent(name -> {
-            Slide slide = new Slide(name);
+            Slide slide = new Slide();
+            slide.setName(name);
             getPresentation().getSlides().add(slide);
             setSelectedSlide(slide);
         });
@@ -479,8 +479,8 @@ public class Workbench extends StackPane {
         presentationView.addEventFilter(MouseEvent.MOUSE_CLICKED, evt -> {
             if (evt.getClickCount() == 1 && evt.getButton().equals(MouseButton.PRIMARY)) {
                 Object object = evt.getTarget();
-                if (object instanceof LayerView) {
-                    LayerView view = (LayerView) object;
+                if (object instanceof ElementView) {
+                    ElementView view = (ElementView) object;
                     initResize(view);
                 } else if (!(object instanceof ResizeHandle) && !(object instanceof ResizeHandles)) {
                     stopResize();
@@ -492,15 +492,15 @@ public class Workbench extends StackPane {
             if (evt.getClickCount() == 1 && evt.getButton().equals(MouseButton.PRIMARY)) {
                 Object object = evt.getTarget();
 
-                LayerView layerView = null;
-                if (object instanceof LayerView) {
-                    layerView = (LayerView) object;
+                ElementView elementView = null;
+                if (object instanceof ElementView) {
+                    elementView = (ElementView) object;
                 } else if (object instanceof ResizeHandles) {
-                    layerView = ((ResizeHandles) object).getLayerView();
+                    elementView = ((ResizeHandles) object).getElementView();
                 }
 
-                if (layerView != null) {
-                    setSelectedLayer(layerView.getLayer());
+                if (elementView != null) {
+                    setSelectedElement(elementView.getElement());
                     mouseX = evt.getSceneX();
                     mouseY = evt.getSceneY();
                 } else if (!(object instanceof ResizeHandle) && !(object instanceof ResizeHandles)) {
@@ -514,18 +514,18 @@ public class Workbench extends StackPane {
         presentationView.addEventFilter(MouseEvent.MOUSE_DRAGGED, evt -> {
             Object object = evt.getTarget();
 
-            LayerView layerView = null;
-            if (object instanceof LayerView) {
-                layerView = (LayerView) object;
+            ElementView elementView = null;
+            if (object instanceof ElementView) {
+                elementView = (ElementView) object;
             } else if (object instanceof ResizeHandles) {
-                layerView = ((ResizeHandles) object).getLayerView();
+                elementView = ((ResizeHandles) object).getElementView();
             }
 
-            if (layerView != null) {
-                if (layerView.getLayer().getLayoutStrategy().equals(LayoutStrategy.ABSOLUTE)) {
+            if (elementView != null) {
+                if (elementView.getElement().getLayoutStrategy().equals(LayoutStrategy.ABSOLUTE)) {
                     double deltaX = evt.getSceneX() - mouseX;
                     double deltaY = evt.getSceneY() - mouseY;
-                    layerView.relocate(layerView.getLayoutX() + deltaX, layerView.getLayoutY() + deltaY);
+                    elementView.relocate(elementView.getLayoutX() + deltaX, elementView.getLayoutY() + deltaY);
                     mouseX = evt.getSceneX();
                     mouseY = evt.getSceneY();
                 }
@@ -558,20 +558,24 @@ public class Workbench extends StackPane {
                         if (image || video) {
                             project.addFile(file);
                             String fileName = file.getName();
-                            Layer layer = new Layer(fileName);
                             if (image) {
-                                layer.setImageFileName(fileName);
+                                ImageElement imageElement = new ImageElement();
+                                imageElement.setName(fileName);
+                                imageElement.setImageFileName(fileName);
                                 Image tempImage = new Image(project.getFile(fileName).toURI().toURL().toExternalForm());
-                                layer.setWidth(tempImage.getWidth());
-                                layer.setHeight(tempImage.getHeight());
+                                imageElement.setWidth(tempImage.getWidth());
+                                imageElement.setHeight(tempImage.getHeight());
+                                slide.getElements().add(imageElement);
                             } else {
-                                layer.setVideoFileName(fileName);
-                                layer.setWidth(320);
-                                layer.setHeight(180);
-                            }
+                                VideoElement videoElement = new VideoElement();
+                                videoElement.setName(fileName);
+                                videoElement.setVideoFileName(fileName);
 
-                            layer.setType(image ? LayerType.IMAGE : LayerType.VIDEO);
-                            slide.getLayers().add(layer);
+                                // 16:9 aspect ratio is default
+                                videoElement.setWidth(320);
+                                videoElement.setHeight(180);
+                                slide.getElements().add(videoElement);
+                            }
                         }
                     } catch (Exception ex) {
                         ex.printStackTrace();
@@ -585,10 +589,10 @@ public class Workbench extends StackPane {
 
         presentationView.addEventFilter(KeyEvent.KEY_PRESSED, evt -> {
             if (evt.getCode().equals(KeyCode.BACK_SPACE)) {
-                Layer layer = getSelectedLayer();
-                if (layer != null) {
+                Element element = getSelectedElement();
+                if (element != null) {
                     // TODO: add confirmation dialog
-                    getSelectedSlide().getLayers().remove(layer);
+                    getSelectedSlide().getElements().remove(element);
                 }
             }
         });
@@ -601,16 +605,16 @@ public class Workbench extends StackPane {
 
             Object object = evt.getTarget();
 
-            LayerView layerView = null;
-            if (object instanceof LayerView) {
-                layerView = (LayerView) object;
+            ElementView elementView = null;
+            if (object instanceof ElementView) {
+                elementView = (ElementView) object;
             } else if (object instanceof ResizeHandles) {
-                layerView = ((ResizeHandles) object).getLayerView();
+                elementView = ((ResizeHandles) object).getElementView();
             }
 
-            if (layerView != null) {
+            if (elementView != null) {
 
-                final Layer layer = layerView.getLayer();
+                final Element element = elementView.getElement();
 
                 contextMenu = new ContextMenu();
                 contextMenu.setAutoHide(true);
@@ -618,30 +622,30 @@ public class Workbench extends StackPane {
 
                 MenuItem toFront = new MenuItem("To Front");
                 toFront.setOnAction(e -> {
-                    getSelectedSlide().getLayers().remove(layer);
-                    getSelectedSlide().getLayers().add(layer);
+                    getSelectedSlide().getElements().remove(element);
+                    getSelectedSlide().getElements().add(element);
                 });
 
                 MenuItem toBack = new MenuItem("To Back");
                 toBack.setOnAction(e -> {
-                    getSelectedSlide().getLayers().remove(layer);
-                    getSelectedSlide().getLayers().add(0, layer);
+                    getSelectedSlide().getElements().remove(element);
+                    getSelectedSlide().getElements().add(0, element);
                 });
 
                 SeparatorMenuItem separatorMenuItem = new SeparatorMenuItem();
 
                 MenuItem forward = new MenuItem("Forward");
                 forward.setOnAction(e -> {
-                    int index = getSelectedSlide().getLayers().indexOf(layer);
-                    getSelectedSlide().getLayers().remove(layer);
-                    getSelectedSlide().getLayers().add(index + 1, layer);
+                    int index = getSelectedSlide().getElements().indexOf(element);
+                    getSelectedSlide().getElements().remove(element);
+                    getSelectedSlide().getElements().add(index + 1, element);
                 });
 
                 MenuItem backward = new MenuItem("Backward");
                 backward.setOnAction(e -> {
-                    int index = getSelectedSlide().getLayers().indexOf(layer);
-                    getSelectedSlide().getLayers().remove(layer);
-                    getSelectedSlide().getLayers().add(Math.max(0, index - 1), layer);
+                    int index = getSelectedSlide().getElements().indexOf(element);
+                    getSelectedSlide().getElements().remove(element);
+                    getSelectedSlide().getElements().add(Math.max(0, index - 1), element);
                 });
 
                 contextMenu.getItems().addAll(toFront, toBack, separatorMenuItem, forward, backward);

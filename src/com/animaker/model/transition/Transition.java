@@ -1,6 +1,6 @@
 package com.animaker.model.transition;
 
-import com.animaker.view.LayerView;
+import com.animaker.view.ElementView;
 import javafx.animation.Interpolator;
 import javafx.animation.Timeline;
 import javafx.beans.property.ObjectProperty;
@@ -68,11 +68,11 @@ public abstract class Transition {
         return interpolator.get();
     }
 
-    public void setup(LayerView layerView) {
+    public void setup(ElementView elementView) {
         System.out.println("setup() for transition " + getName() + " not implemented, yet.");
     }
 
-    public void configure(LayerView layerView, Timeline timeline) {
+    public void configure(ElementView elementView, Timeline timeline) {
         System.out.println("configure() for transition " + getName() + " not implemented, yet.");
     }
 }
