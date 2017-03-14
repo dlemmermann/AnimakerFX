@@ -1,18 +1,31 @@
 package com.animaker.model;
 
+import com.animaker.model.transition.FadeIn;
+import com.animaker.model.transition.MoveIn;
+import com.animaker.model.transition.MoveIn.TransitionDirection;
+import com.animaker.model.transition.Play;
 import com.animaker.model.transition.Transition;
-import javafx.beans.property.*;
+import javafx.animation.Interpolator;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
-import javafx.geometry.Side;
+import javafx.util.Duration;
 
 import javax.xml.bind.annotation.XmlType;
 
-@XmlType(name="Layer")
+@XmlType(name = "Layer")
 public class Layer extends ModelObject {
 
     public enum LayerType {
+        REGION,
         IMAGE,
         TEXT,
         VIDEO,
@@ -22,6 +35,30 @@ public class Layer extends ModelObject {
     }
 
     public Layer() {
+        final MoveIn moveIn = new MoveIn();
+        moveIn.setDirection(TransitionDirection.RIGHT_TO_LEFT);
+        moveIn.setDuration(Duration.seconds(1));
+        nameProperty().addListener(it -> {
+            if (getName().equals("ikea")) {
+                moveIn.setDirection(TransitionDirection.BOTTOM_TO_TOP);
+                moveIn.setDuration(Duration.seconds(2));
+                moveIn.setDelay(Duration.seconds(1));
+            }
+        });
+
+        moveIn.setInterpolator(Interpolator.EASE_IN);
+        FadeIn fadeIn = new FadeIn();
+        fadeIn.setDuration(Duration.seconds(1));
+        fadeIn.setDelay(Duration.seconds(.5));
+        getOpeningTransitions().addAll(moveIn, fadeIn);
+
+        typeProperty().addListener(it -> {
+            if (getType().equals(LayerType.VIDEO)) {
+                final Play play = new Play();
+                play.setDuration(Duration.seconds(30));
+                getOpeningTransitions().add(play);
+            }
+        });
     }
 
     public Layer(String name) {
@@ -329,7 +366,7 @@ public class Layer extends ModelObject {
 
     // video content support / preserve ratio
 
-    private final BooleanProperty preserveRatio = new SimpleBooleanProperty(this, "preserveRatio", true);
+    private final BooleanProperty preserveRatio = new SimpleBooleanProperty(this, "preserveRatio", false);
 
     public final BooleanProperty preserveRatioProperty() {
         return preserveRatio;
@@ -361,18 +398,18 @@ public class Layer extends ModelObject {
 
     // code content support
 
-    private final StringProperty codeContent = new SimpleStringProperty(this, "codeContent");
+    private final StringProperty className = new SimpleStringProperty(this, "className", "com.animaker.view.builder.TestStatusBar");
 
-    public final StringProperty codeContentProperty() {
-        return codeContent;
+    public final StringProperty classNameProperty() {
+        return className;
     }
 
-    public final String getCodeContent() {
-        return codeContent.get();
+    public final String getClassName() {
+        return className.get();
     }
 
-    public final void setCodeContent(String content) {
-        this.codeContent.set(content);
+    public final void setClassName(String content) {
+        this.className.set(content);
     }
 
     // web content support
@@ -390,4 +427,37 @@ public class Layer extends ModelObject {
     public final void setHtmlContent(String content) {
         this.htmlContent.set(content);
     }
+
+    // width support
+
+    private final DoubleProperty width = new SimpleDoubleProperty(this, "width", 200);
+
+    public final DoubleProperty widthProperty() {
+        return width;
+    }
+
+    public final void setWidth(double width) {
+        this.width.set(width);
+    }
+
+    public final double getWidth() {
+        return width.get();
+    }
+
+    // height support
+
+    private final DoubleProperty height = new SimpleDoubleProperty(this, "height", 200);
+
+    public final DoubleProperty heightProperty() {
+        return height;
+    }
+
+    public final void setHeight(double height) {
+        this.height.set(height);
+    }
+
+    public final double getHeight() {
+        return height.get();
+    }
+
 }

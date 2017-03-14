@@ -132,11 +132,6 @@
 }
 
 .layer:pressed {
-    -fx-border-color: red;
-    -fx-border-style: dashed;
-    -fx-border-width: 2;
-    -fx-stroke-dash-array: 4;
-    -fx-effect: dropshadow(gaussian, black, 128, 0, 6, 6);
 }
 
 .presentation-wrapper {
@@ -148,4 +143,61 @@
 
 .empty-background-presentation {
     -fx-background-color: green;
+}
+
+.resize-handle {
+    -fx-background-color: white;
+    -fx-border-color: black;
+    -fx-pref-width: 8;
+    -fx-pref-height: 8;
+    -fx-max-width: 8;
+    -fx-max-height: 8;
+}
+
+.resize-handle.top-left {
+    -fx-translate-x: -4;
+    -fx-translate-y: -4;
+    -fx-cursor: nw-resize;
+}
+
+.resize-handle.top-center {
+    -fx-translate-x: 0;
+    -fx-translate-y: -4;
+    -fx-cursor: n-resize;
+}
+
+.resize-handle.top-right {
+    -fx-translate-x: 4;
+    -fx-translate-y: -4;
+    -fx-cursor: ne-resize;
+}
+
+.resize-handle.center-left {
+    -fx-translate-x: -4;
+    -fx-translate-y: 0;
+    -fx-cursor: w-resize;
+}
+
+.resize-handle.center-right {
+    -fx-translate-x: 4;
+    -fx-translate-y: 0;
+    -fx-cursor: e-resize;
+}
+
+.resize-handle.bottom-left {
+    -fx-translate-x: -4;
+    -fx-translate-y: 4;
+    -fx-cursor: sw-resize;
+}
+
+.resize-handle.bottom-center {
+    -fx-translate-x: 0;
+    -fx-translate-y: 4;
+    -fx-cursor: s-resize;
+}
+
+.resize-handle.bottom-right {
+    -fx-translate-x: 4;
+    -fx-translate-y: 4;
+    -fx-cursor: se-resize;
 }

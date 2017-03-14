@@ -82,7 +82,7 @@ public class MoveIn extends Transition {
             case LEFT_TO_RIGHT:
             case TOP_LEFT_TO_BOTTOM_RIGHT:
             case BOTTOM_LEFT_TO_TOP_RIGHT:
-                return -view.getWidth();
+                return -view.getLayoutX() - view.getWidth();
             case RIGHT_TO_LEFT:
             case TOP_RIGHT_TO_BOTTOM_LEFT:
             case BOTTOM_RIGHT_TO_TOP_LEFT:
@@ -99,7 +99,7 @@ public class MoveIn extends Transition {
             case TOP_LEFT_TO_BOTTOM_RIGHT:
             case TOP_RIGHT_TO_BOTTOM_LEFT:
             case TOP_TO_BOTTOM:
-                return -view.getHeight();
+                return -view.getLayoutY() - view.getHeight();
             case BOTTOM_LEFT_TO_TOP_RIGHT:
             case BOTTOM_RIGHT_TO_TOP_LEFT:
             case BOTTOM_TO_TOP:

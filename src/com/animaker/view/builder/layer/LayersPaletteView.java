@@ -241,6 +241,9 @@ public class LayersPaletteView extends SlideControlBase {
                 case HTML:
                     view = FontAwesomeIconFactory.get().createIcon(FontAwesomeIcon.HTML5);
                     break;
+                case REGION:
+                    view = FontAwesomeIconFactory.get().createIcon(FontAwesomeIcon.TIMES_RECTANGLE);
+                    break;
             }
 
             view.getStyleClass().add("layer-button");

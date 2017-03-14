@@ -1,12 +1,15 @@
 package com.animaker.view.builder;
 
 import com.animaker.model.Layer;
+import com.animaker.model.Layer.LayerType;
+import com.animaker.model.Layer.LayoutStrategy;
 import com.animaker.model.Presentation;
 import com.animaker.model.Project;
 import com.animaker.model.Slide;
 import com.animaker.view.LayerView;
 import com.animaker.view.PresentationView;
 import com.animaker.view.PresentationView.Status;
+import com.animaker.view.builder.ResizeHandles.ResizeHandle;
 import com.animaker.view.builder.layer.LayerSettingsTabPane;
 import com.animaker.view.builder.layer.LayersPaletteView;
 import com.animaker.view.builder.slide.SlidesPaletteView;
@@ -19,25 +22,34 @@ import javafx.geometry.Side;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.ToolBar;
 import javafx.scene.effect.DropShadow;
+import javafx.scene.image.Image;
+import javafx.scene.input.ContextMenuEvent;
+import javafx.scene.input.DragEvent;
+import javafx.scene.input.Dragboard;
+import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCombination;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.input.TransferMode;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import org.controlsfx.control.MasterDetailPane;
-import org.controlsfx.control.PropertySheet;
-import org.controlsfx.property.BeanPropertyUtils;
 import org.scenicview.ScenicView;
 
 import javax.xml.bind.JAXBContext;
@@ -135,7 +147,7 @@ public class Workbench extends StackPane {
         selectedSlideProperty().addListener(it -> {
             Slide slide = getSelectedSlide();
             if (slide != null) {
-               // propertySheet.getItems().setAll(BeanPropertyUtils.getProperties(getSelectedSlide()));
+                // propertySheet.getItems().setAll(BeanPropertyUtils.getProperties(getSelectedSlide()));
             }
         });
 
@@ -151,6 +163,19 @@ public class Workbench extends StackPane {
 
         loadPreferences();
         updateSlide();
+    }
+
+    // resize support
+
+    public final void initResize(LayerView layerView) {
+        presentationView.getChildren().removeIf(child -> child instanceof ResizeHandles);
+        ResizeHandles resizeHandles = new ResizeHandles(layerView);
+        presentationView.getChildren().add(resizeHandles);
+        resizeHandles.toFront();
+    }
+
+    public final void stopResize() {
+        presentationView.getChildren().removeIf(child -> child instanceof ResizeHandles);
     }
 
     // project support
@@ -451,28 +476,190 @@ public class Workbench extends StackPane {
 
     private void installHandlers(PresentationView presentationView) {
 
-        presentationView.addEventFilter(MouseEvent.MOUSE_PRESSED, evt -> {
+        presentationView.addEventFilter(MouseEvent.MOUSE_CLICKED, evt -> {
             if (evt.getClickCount() == 1 && evt.getButton().equals(MouseButton.PRIMARY)) {
                 Object object = evt.getTarget();
                 if (object instanceof LayerView) {
                     LayerView view = (LayerView) object;
-                    setSelectedLayer(view.getLayer());
-                    mouseX = evt.getSceneX() ;
-                    mouseY = evt.getSceneY() ;
+                    initResize(view);
+                } else if (!(object instanceof ResizeHandle) && !(object instanceof ResizeHandles)) {
+                    stopResize();
                 }
             }
         });
 
+        presentationView.addEventFilter(MouseEvent.MOUSE_PRESSED, evt -> {
+            if (evt.getClickCount() == 1 && evt.getButton().equals(MouseButton.PRIMARY)) {
+                Object object = evt.getTarget();
+
+                LayerView layerView = null;
+                if (object instanceof LayerView) {
+                    layerView = (LayerView) object;
+                } else if (object instanceof ResizeHandles) {
+                    layerView = ((ResizeHandles) object).getLayerView();
+                }
+
+                if (layerView != null) {
+                    setSelectedLayer(layerView.getLayer());
+                    mouseX = evt.getSceneX();
+                    mouseY = evt.getSceneY();
+                } else if (!(object instanceof ResizeHandle) && !(object instanceof ResizeHandles)) {
+                    stopResize();
+                }
+            }
+
+            presentationView.requestFocus();
+        });
+
         presentationView.addEventFilter(MouseEvent.MOUSE_DRAGGED, evt -> {
             Object object = evt.getTarget();
+
+            LayerView layerView = null;
             if (object instanceof LayerView) {
-                LayerView view = (LayerView) object;
-                double deltaX = evt.getSceneX() - mouseX ;
-                double deltaY = evt.getSceneY() - mouseY ;
-                view.relocate(view.getLayoutX() + deltaX, view.getLayoutY() + deltaY);
-                mouseX = evt.getSceneX() ;
-                mouseY = evt.getSceneY() ;
+                layerView = (LayerView) object;
+            } else if (object instanceof ResizeHandles) {
+                layerView = ((ResizeHandles) object).getLayerView();
+            }
+
+            if (layerView != null) {
+                if (layerView.getLayer().getLayoutStrategy().equals(LayoutStrategy.ABSOLUTE)) {
+                    double deltaX = evt.getSceneX() - mouseX;
+                    double deltaY = evt.getSceneY() - mouseY;
+                    layerView.relocate(layerView.getLayoutX() + deltaX, layerView.getLayoutY() + deltaY);
+                    mouseX = evt.getSceneX();
+                    mouseY = evt.getSceneY();
+                }
             }
         });
+
+        presentationView.addEventFilter(DragEvent.DRAG_OVER, evt -> {
+            Dragboard db = evt.getDragboard();
+            if (db.hasFiles()) {
+                evt.acceptTransferModes(TransferMode.COPY);
+            } else {
+                evt.consume();
+            }
+        });
+
+        presentationView.addEventHandler(DragEvent.DRAG_DROPPED, evt -> {
+            Dragboard db = evt.getDragboard();
+            boolean success = false;
+            if (db.hasFiles()) {
+                success = true;
+
+                final Project project = getProject();
+                final Slide slide = getSelectedSlide();
+
+                db.getFiles().forEach(file -> {
+                    try {
+                        final boolean image = isImage(file);
+                        final boolean video = isVideo(file);
+
+                        if (image || video) {
+                            project.addFile(file);
+                            String fileName = file.getName();
+                            Layer layer = new Layer(fileName);
+                            if (image) {
+                                layer.setImageFileName(fileName);
+                                Image tempImage = new Image(project.getFile(fileName).toURI().toURL().toExternalForm());
+                                layer.setWidth(tempImage.getWidth());
+                                layer.setHeight(tempImage.getHeight());
+                            } else {
+                                layer.setVideoFileName(fileName);
+                                layer.setWidth(320);
+                                layer.setHeight(180);
+                            }
+
+                            layer.setType(image ? LayerType.IMAGE : LayerType.VIDEO);
+                            slide.getLayers().add(layer);
+                        }
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
+                });
+            }
+
+            evt.setDropCompleted(success);
+            evt.consume();
+        });
+
+        presentationView.addEventFilter(KeyEvent.KEY_PRESSED, evt -> {
+            if (evt.getCode().equals(KeyCode.BACK_SPACE)) {
+                Layer layer = getSelectedLayer();
+                if (layer != null) {
+                    // TODO: add confirmation dialog
+                    getSelectedSlide().getLayers().remove(layer);
+                }
+            }
+        });
+
+        presentationView.addEventFilter(ContextMenuEvent.CONTEXT_MENU_REQUESTED, evt -> {
+
+            if (contextMenu != null && contextMenu.isShowing()) {
+                contextMenu.hide();
+            }
+
+            Object object = evt.getTarget();
+
+            LayerView layerView = null;
+            if (object instanceof LayerView) {
+                layerView = (LayerView) object;
+            } else if (object instanceof ResizeHandles) {
+                layerView = ((ResizeHandles) object).getLayerView();
+            }
+
+            if (layerView != null) {
+
+                final Layer layer = layerView.getLayer();
+
+                contextMenu = new ContextMenu();
+                contextMenu.setAutoHide(true);
+                contextMenu.setAutoFix(true);
+
+                MenuItem toFront = new MenuItem("To Front");
+                toFront.setOnAction(e -> {
+                    getSelectedSlide().getLayers().remove(layer);
+                    getSelectedSlide().getLayers().add(layer);
+                });
+
+                MenuItem toBack = new MenuItem("To Back");
+                toBack.setOnAction(e -> {
+                    getSelectedSlide().getLayers().remove(layer);
+                    getSelectedSlide().getLayers().add(0, layer);
+                });
+
+                SeparatorMenuItem separatorMenuItem = new SeparatorMenuItem();
+
+                MenuItem forward = new MenuItem("Forward");
+                forward.setOnAction(e -> {
+                    int index = getSelectedSlide().getLayers().indexOf(layer);
+                    getSelectedSlide().getLayers().remove(layer);
+                    getSelectedSlide().getLayers().add(index + 1, layer);
+                });
+
+                MenuItem backward = new MenuItem("Backward");
+                backward.setOnAction(e -> {
+                    int index = getSelectedSlide().getLayers().indexOf(layer);
+                    getSelectedSlide().getLayers().remove(layer);
+                    getSelectedSlide().getLayers().add(Math.max(0, index - 1), layer);
+                });
+
+                contextMenu.getItems().addAll(toFront, toBack, separatorMenuItem, forward, backward);
+
+                contextMenu.show(presentationView, evt.getScreenX(), evt.getScreenY());
+            }
+        });
+    }
+
+    private ContextMenu contextMenu;
+
+    private boolean isImage(File file) {
+        String suffix = file.getName().substring(file.getName().lastIndexOf("."));
+        return suffix.equals(".png") || suffix.equals(".jpg") || suffix.equals(".gif");
+    }
+
+    private boolean isVideo(File file) {
+        String suffix = file.getName().substring(file.getName().lastIndexOf("."));
+        return suffix.equals(".mp4");
     }
 }

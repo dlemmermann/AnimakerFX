@@ -85,6 +85,7 @@ public class AnimakerApp extends Application {
         view.projectProperty().addListener(it -> primaryStage.setTitle("AnimakerFX: " + view.getProject().getName()));
 
         Scene scene = new Scene(view);
+        scene.focusOwnerProperty().addListener(it -> System.out.println("focus owner: " + scene.getFocusOwner()));
         primaryStage.setTitle("AnimakerFX");
         primaryStage.setScene(scene);
         primaryStage.setWidth(1760);

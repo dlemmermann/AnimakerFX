@@ -60,6 +60,8 @@ public class PresentationView extends Pane {
         clip.widthProperty().bind(widthProperty());
         clip.heightProperty().bind(heightProperty());
         setClip(clip);
+
+        setFocusTraversable(true);
     }
 
     public void destroy() {
@@ -70,12 +72,18 @@ public class PresentationView extends Pane {
 
     @Override
     protected void layoutChildren() {
+        /*
+         * Still call super.layoutChildren() because things like the ResizeHandles are still managed
+         * nodes.
+         */
+        super.layoutChildren();
+
         double w = getWidth();
         double h = getHeight();
 
         Insets insets = getInsets();
 
-        getChildren().forEach(child -> child.resizeRelocate(insets.getLeft(), insets.getTop(),
+        getChildren().filtered(node -> node instanceof SlideView).forEach(child -> child.resizeRelocate(insets.getLeft(), insets.getTop(),
                 w - insets.getLeft() - insets.getRight(), h - insets.getTop() - insets.getBottom()));
     }
 
