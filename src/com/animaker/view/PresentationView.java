@@ -3,8 +3,11 @@ package com.animaker.view;
 import com.animaker.model.Presentation;
 import com.animaker.model.Project;
 import com.animaker.model.Slide;
+import javafx.animation.Timeline;
 import javafx.beans.Observable;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.ReadOnlyObjectProperty;
+import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -112,6 +115,18 @@ public class PresentationView extends Pane {
         return currentSlide.get();
     }
 
+    // current slide view support
+
+    private final ReadOnlyObjectWrapper<SlideView> currentSlideView = new ReadOnlyObjectWrapper<>(this, "currentSlideView");
+
+    public final ReadOnlyObjectProperty<SlideView> currentSlideViewProperty() {
+        return currentSlideView.getReadOnlyProperty();
+    }
+
+    public final SlideView getCurrentSlideView() {
+        return currentSlideView.get();
+    }
+
     public enum Status {
         STOPPED,
         PAUSED,
@@ -199,18 +214,18 @@ public class PresentationView extends Pane {
     }
 
     private void updateSlide() {
-        Slide slide = getCurrentSlide();
-
         if (mediaView != null) {
             getChildren().setAll(mediaView);
         } else {
             getChildren().clear();
         }
 
+        Slide slide = getCurrentSlide();
         if (slide != null) {
             SlideView slideView = new SlideView(this, slide);
             StackPane.setAlignment(slideView, Pos.CENTER);
             getChildren().add(slideView);
+            currentSlideView.set(slideView);
         }
     }
 

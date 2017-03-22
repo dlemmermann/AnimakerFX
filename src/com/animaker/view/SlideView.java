@@ -36,6 +36,7 @@ import javafx.scene.layout.BackgroundPosition;
 import javafx.scene.layout.BackgroundRepeat;
 import javafx.scene.layout.BackgroundSize;
 import javafx.scene.layout.Pane;
+import javafx.util.Duration;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -86,6 +87,10 @@ public class SlideView extends Pane {
         slide.backgroundImageFileNameProperty().addListener(it -> updateBackgroundImage());
         buildSlide();
         updateBackgroundImage();
+    }
+
+    public Timeline getTimeline() {
+        return timeline;
     }
 
     private void updateBackgroundImage() {
@@ -244,26 +249,40 @@ public class SlideView extends Pane {
     }
 
     public final void play() {
-
         if (timeline.getStatus().equals(Worker.State.RUNNING)) {
             timeline.stop();
             timeline.getKeyFrames().clear();
         }
 
-        final List<ElementView> elementViews = getLayerViews();
+        final List<ElementView> elementViews = getElementViews();
         elementViews.forEach(view -> view.setupAnimation());
         elementViews.forEach(view -> view.configureAnimation(timeline));
 
         timeline.playFromStart();
     }
 
-    private List<ElementView> getLayerViews() {
+    public final void jumpTo(Duration duration) {
+        if (timeline.getStatus().equals(Worker.State.RUNNING)) {
+            timeline.stop();
+            timeline.getKeyFrames().clear();
+        }
+
+        final List<ElementView> elementViews = getElementViews();
+        elementViews.forEach(view -> view.setupAnimation());
+        elementViews.forEach(view -> view.configureAnimation(timeline));
+
+        timeline.play();
+        timeline.jumpTo(duration);
+        timeline.pause();
+    }
+
+    private List<ElementView> getElementViews() {
         List<ElementView> views = new ArrayList<>();
-        doGetLayerViews(this, views);
+        doGetElementViews(this, views);
         return views;
     }
 
-    private void doGetLayerViews(Parent parent, List<ElementView> views) {
+    private void doGetElementViews(Parent parent, List<ElementView> views) {
         views.addAll(parent.getChildrenUnmodifiable().stream()
                 .filter(child -> child instanceof ElementView)
                 .map(child -> (ElementView) child)
@@ -271,7 +290,7 @@ public class SlideView extends Pane {
 
         parent.getChildrenUnmodifiable().forEach(child -> {
             if (child instanceof Parent) {
-                doGetLayerViews((Parent) child, views);
+                doGetElementViews((Parent) child, views);
             }
         });
     }

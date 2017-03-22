@@ -6,7 +6,6 @@ import com.animaker.model.Element.Side;
 import com.animaker.view.builder.Workbench;
 import javafx.beans.binding.Bindings;
 import javafx.geometry.Pos;
-import javafx.scene.Node;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
@@ -17,7 +16,7 @@ import javafx.util.converter.NumberStringConverter;
 /**
  * Created by lemmi on 10.03.17.
  */
-public class LayerPositioningView extends LayerSettingsBase {
+public class ElementPositioningView extends ElementSettingsView<Element> {
 
     private ComboBox<LayoutStrategy> layoutBox;
     private TextField xLayoutField;
@@ -25,18 +24,9 @@ public class LayerPositioningView extends LayerSettingsBase {
     private ComboBox<Side> sideBox;
     private ComboBox<Pos> positionBox;
 
-    public LayerPositioningView(Workbench workbench) {
+    public ElementPositioningView(Workbench workbench) {
         super(workbench);
 
-        getStyleClass().add("palette");
-
-        layoutBox.getItems().setAll(LayoutStrategy.values());
-        sideBox.getItems().setAll(Side.values());
-        positionBox.getItems().setAll(Pos.values());
-    }
-
-    @Override
-    protected Node createContent() {
         layoutBox = new ComboBox<>();
         xLayoutField = new TextField();
         yLayoutField = new TextField();
@@ -56,11 +46,17 @@ public class LayerPositioningView extends LayerSettingsBase {
         borderPane.setTop(layoutBox);
         borderPane.setCenter(hbox);
 
-        return borderPane;
+        getChildren().add(borderPane);
+
+        layoutBox.getItems().setAll(LayoutStrategy.values());
+        sideBox.getItems().setAll(Side.values());
+        positionBox.getItems().setAll(Pos.values());
+
+        elementProperty().bind(workbench.selectedElementProperty());
     }
 
     @Override
-    protected void updateView(Element oldElement, Element newElement) {
+    protected void update(Element oldElement, Element newElement) {
         if (oldElement != null) {
             Bindings.unbindBidirectional(layoutBox.valueProperty(), oldElement.layoutStrategyProperty());
             Bindings.unbindBidirectional(xLayoutField.textProperty(), oldElement.layoutXProperty());

@@ -39,11 +39,11 @@ import javafx.scene.layout.VBox;
 /**
  * Created by lemmi on 21.12.16.
  */
-public class LayersPaletteView extends SlideControlBase {
+public class ElementsPaletteView extends SlideControlBase {
 
     private ListView<Element> listView;
 
-    public LayersPaletteView(Workbench workbench) {
+    public ElementsPaletteView(Workbench workbench) {
         super(workbench);
 
         getStyleClass().add("palette");
@@ -91,8 +91,6 @@ public class LayersPaletteView extends SlideControlBase {
         borderPane.setBottom(hbox);
 
         getChildren().add(borderPane);
-
-        slideProperty().addListener(it -> updateView());
     }
 
     private Element createNewElement(ElementType type) {
@@ -130,10 +128,10 @@ public class LayersPaletteView extends SlideControlBase {
         return selectedLayer.get();
     }
 
-    private void updateView() {
-        Slide slide = getSlide();
-        if (slide != null) {
-            listView.setItems(slide.getElements());
+    @Override
+    protected void updateSlide(Slide oldSlide, Slide newSlide) {
+        if (newSlide != null) {
+            listView.setItems(newSlide.getElements());
         } else {
             listView.setItems(FXCollections.emptyObservableList());
         }
@@ -199,6 +197,12 @@ public class LayersPaletteView extends SlideControlBase {
             box.getChildren().setAll(typeLabel, nameField, visibleButton, lockedButton);
 
             itemProperty().addListener((observable, oldElement, newElement) -> {
+                if (oldElement != null) {
+                    Bindings.unbindBidirectional(visibleButton.selectedProperty(), oldElement.visibleProperty());
+                    Bindings.unbindBidirectional(lockedButton.selectedProperty(), oldElement.lockedProperty());
+                    Bindings.unbindBidirectional(nameField.textProperty(), oldElement.nameProperty());
+                }
+
                 if (newElement != null) {
                     Bindings.bindBidirectional(visibleButton.selectedProperty(), newElement.visibleProperty());
                     Bindings.bindBidirectional(lockedButton.selectedProperty(), newElement.lockedProperty());
@@ -209,11 +213,6 @@ public class LayersPaletteView extends SlideControlBase {
                     newElement.lockedProperty().addListener(weakLockChangeListener);
 
                     typeLabel.setGraphic(getTypeIcon(newElement.getType()));
-                }
-                if (oldElement != null) {
-                    Bindings.unbindBidirectional(visibleButton.selectedProperty(), oldElement.visibleProperty());
-                    Bindings.unbindBidirectional(lockedButton.selectedProperty(), oldElement.lockedProperty());
-                    Bindings.unbindBidirectional(nameField.textProperty(), oldElement.nameProperty());
                 }
             });
 

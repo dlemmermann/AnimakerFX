@@ -22,6 +22,12 @@ public class TextSettingsView extends ElementSettingsView<TextElement> {
         BorderPane borderPane = new BorderPane();
         borderPane.setCenter(textArea);
         BorderPane.setMargin(textArea, new Insets(5, 10, 10, 10));
+
+        workbench.selectedElementProperty().addListener(it -> {
+            if (workbench.getSelectedElement() instanceof TextElement) {
+                setElement((TextElement) workbench.getSelectedElement());
+            }
+        });
     }
 
     @Override

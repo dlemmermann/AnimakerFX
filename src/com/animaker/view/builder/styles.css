@@ -201,3 +201,13 @@
     -fx-translate-y: 4;
     -fx-cursor: se-resize;
 }
+
+.transition-line {
+    -fx-background-color: orange;
+}
+
+.current-time-indicator {
+    -fx-stroke: red;
+    -fx-stroke-width: 4px;
+    -fx-cursor: w_resize;
+}

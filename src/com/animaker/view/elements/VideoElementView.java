@@ -4,7 +4,6 @@ import com.animaker.model.elements.VideoElement;
 import com.animaker.view.ElementView;
 import com.animaker.view.PresentationView;
 import com.animaker.view.SlideView;
-import javafx.scene.Node;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaView;
@@ -26,6 +25,7 @@ public class VideoElementView extends ElementView<VideoElement> {
                 Media media = new Media(file.toURI().toURL().toExternalForm());
                 MediaPlayer player = new MediaPlayer(media);
                 MediaView view = new MediaView(player);
+                view.setMouseTransparent(true);
                 view.preserveRatioProperty().bind(element.preserveRatioProperty());
                 playProperty().addListener(it -> {
                     if (isPlay()) {
@@ -52,8 +52,8 @@ public class VideoElementView extends ElementView<VideoElement> {
                     }
                 });
 
-                view.fitHeightProperty().bind(heightProperty());
-                view.fitWidthProperty().bind(widthProperty());
+                view.fitHeightProperty().bind(element.heightProperty());
+                view.fitWidthProperty().bind(element.widthProperty());
 
                 getChildren().add(view);
             }

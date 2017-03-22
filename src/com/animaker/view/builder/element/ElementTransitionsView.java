@@ -10,9 +10,9 @@ import javafx.scene.layout.Priority;
 /**
  * Created by lemmi on 20.12.16.
  */
-public class LayerTransitionsView extends LayerSettingsBase {
+public class ElementTransitionsView extends ElementSettingsView<Element> {
 
-    public LayerTransitionsView(Workbench workbench) {
+    public ElementTransitionsView(Workbench workbench) {
         super(workbench);
 
         TransitionSettingsView openingTransition = new TransitionSettingsView(workbench, "Opening");
@@ -42,10 +42,12 @@ public class LayerTransitionsView extends LayerSettingsBase {
                 parallaxTransition);
 
         getChildren().setAll(hBox);
+
+        elementProperty().bind(workbench.selectedElementProperty());
     }
 
     @Override
-    protected void updateView(Element oldElement, Element newElement) {
+    protected void update(Element oldElement, Element newElement) {
 
     }
 }

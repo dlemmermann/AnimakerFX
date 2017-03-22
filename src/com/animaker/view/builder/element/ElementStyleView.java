@@ -8,23 +8,23 @@ import javafx.scene.Node;
 import javafx.scene.control.TextArea;
 import javafx.scene.layout.StackPane;
 
-public class LayerStyleView extends LayerSettingsBase {
+public class ElementStyleView extends ElementSettingsView<Element> {
 
     private TextArea textArea;
 
-    public LayerStyleView(Workbench workbench) {
+    public ElementStyleView(Workbench workbench) {
         super(workbench);
-    }
 
-    @Override
-    protected Node createContent() {
         textArea = new TextArea();
         StackPane.setMargin(textArea, new Insets(10));
-        return textArea;
+        getChildren().add(textArea);
+
+        elementProperty().bind(workbench.selectedElementProperty());
     }
 
+
     @Override
-    protected void updateView(Element oldElement, Element newElement) {
+    protected void update(Element oldElement, Element newElement) {
         if (oldElement != null) {
             Bindings.unbindBidirectional(textArea.textProperty(), oldElement.styleProperty());
         }

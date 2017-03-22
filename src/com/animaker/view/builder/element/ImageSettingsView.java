@@ -2,6 +2,7 @@ package com.animaker.view.builder.element;
 
 import com.animaker.model.Project;
 import com.animaker.model.elements.ImageElement;
+import com.animaker.model.elements.TextElement;
 import com.animaker.view.builder.Workbench;
 import javafx.beans.InvalidationListener;
 import javafx.beans.WeakInvalidationListener;
@@ -47,6 +48,12 @@ public class ImageSettingsView extends ElementSettingsView<ImageElement> {
         updateImage();
 
         getChildren().add(borderPane);
+
+        workbench.selectedElementProperty().addListener(it -> {
+            if (workbench.getSelectedElement() instanceof ImageElement) {
+                setElement((ImageElement) workbench.getSelectedElement());
+            }
+        });
     }
 
     final InvalidationListener listenToImageListener = it -> updateImage();

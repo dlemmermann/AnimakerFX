@@ -11,8 +11,8 @@ import com.animaker.view.ElementView;
 import com.animaker.view.PresentationView;
 import com.animaker.view.PresentationView.Status;
 import com.animaker.view.builder.ResizeHandles.ResizeHandle;
-import com.animaker.view.builder.element.LayerSettingsTabPane;
-import com.animaker.view.builder.element.LayersPaletteView;
+import com.animaker.view.builder.element.ElementsPaletteView;
+import com.animaker.view.builder.element.ElementSettingsTabPane;
 import com.animaker.view.builder.slide.SlidesPaletteView;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
@@ -49,6 +49,8 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import org.controlsfx.control.MasterDetailPane;
+import org.controlsfx.control.PropertySheet;
+import org.controlsfx.property.BeanPropertyUtils;
 import org.scenicview.ScenicView;
 
 import javax.xml.bind.JAXBContext;
@@ -67,12 +69,11 @@ public class Workbench extends StackPane {
     public static final String PREF_KEY = "last.animation.project";
     public static final String PREF_SEPARATOR = "!";
 
-    //private PropertySheet propertySheet;
+    private PropertySheet propertySheet;
     private SlidesPaletteView slidesPaletteView;
-    private LayersPaletteView layersPaletteView;
-    private PresentationView presentationView;
+    private ElementsPaletteView elementsPaletteView;
     private MasterDetailPane presentationMasterDetailPane;
-    private LayerSettingsTabPane layerSettingsView;
+    private ElementSettingsTabPane layerSettingsView;
 
     private Button playSlide;
 
@@ -83,11 +84,11 @@ public class Workbench extends StackPane {
 
         MenuBar menuBar = createMenuBar();
 
-//        propertySheet = new PropertySheet();
+        propertySheet = new PropertySheet();
         slidesPaletteView = new SlidesPaletteView(this);
         slidesPaletteView.setPrefHeight(200);
-        layersPaletteView = new LayersPaletteView(this);
-        layerSettingsView = new LayerSettingsTabPane(this);
+        elementsPaletteView = new ElementsPaletteView(this);
+        layerSettingsView = new ElementSettingsTabPane(this);
 
         presentationMasterDetailPane = new MasterDetailPane();
         presentationMasterDetailPane.setDetailSide(Side.BOTTOM);
@@ -98,12 +99,11 @@ public class Workbench extends StackPane {
         leftHandSide.setDetailSide(Side.TOP);
         leftHandSide.setDividerPosition(.2);
         leftHandSide.setDetailNode(slidesPaletteView);
-        leftHandSide.setMasterNode(layersPaletteView);
+        leftHandSide.setMasterNode(elementsPaletteView);
 
         MasterDetailPane rightHandSide = new MasterDetailPane();
         rightHandSide.setDetailSide(Side.RIGHT);
-        //rightHandSide.setDetailNode(propertySheet);
-        rightHandSide.setShowDetailNode(false);
+        rightHandSide.setDetailNode(propertySheet);
         rightHandSide.setMasterNode(presentationMasterDetailPane);
 
         MasterDetailPane centerPane = new MasterDetailPane();
@@ -134,10 +134,10 @@ public class Workbench extends StackPane {
         getChildren().add(vbox);
 
         slidesPaletteView.presentationProperty().bind(presentationProperty());
-        layersPaletteView.slideProperty().bind(slidesPaletteView.selectedSlideProperty());
+        elementsPaletteView.slideProperty().bind(slidesPaletteView.selectedSlideProperty());
 
         Bindings.bindBidirectional(slidesPaletteView.selectedSlideProperty(), selectedSlideProperty());
-        Bindings.bindBidirectional(layersPaletteView.selectedLayerProperty(), selectedElementProperty());
+        Bindings.bindBidirectional(elementsPaletteView.selectedLayerProperty(), selectedElementProperty());
 
         selectedSlideProperty().addListener(it -> updateSlide());
 
@@ -146,15 +146,15 @@ public class Workbench extends StackPane {
         selectedSlideProperty().addListener(it -> {
             Slide slide = getSelectedSlide();
             if (slide != null) {
-                // propertySheet.getItems().setAll(BeanPropertyUtils.getProperties(getSelectedSlide()));
+                    propertySheet.getItems().setAll(BeanPropertyUtils.getProperties(getSelectedSlide()));
             }
         });
 
         selectedElementProperty().addListener(it -> {
             Element element = getSelectedElement();
             if (element != null) {
-//                propertySheet.getItems().
-//                        setAll(BeanPropertyUtils.getProperties(getSelectedElement()));
+                propertySheet.getItems().
+                        setAll(BeanPropertyUtils.getProperties(getSelectedElement()));
             }
         });
 
@@ -167,14 +167,22 @@ public class Workbench extends StackPane {
     // resize support
 
     public final void initResize(ElementView elementView) {
-        presentationView.getChildren().removeIf(child -> child instanceof ResizeHandles);
-        ResizeHandles resizeHandles = new ResizeHandles(elementView);
-        presentationView.getChildren().add(resizeHandles);
+        getPresentationView().getChildren().removeIf(child -> child instanceof ResizeHandles);
+        ResizeHandles resizeHandles = new ResizeHandles(this, elementView);
+        getPresentationView().getChildren().add(resizeHandles);
         resizeHandles.toFront();
     }
 
     public final void stopResize() {
-        presentationView.getChildren().removeIf(child -> child instanceof ResizeHandles);
+        stopResize(null);
+    }
+
+    public final void stopResize(ElementView elementView) {
+        if (elementView == null) {
+            getPresentationView().getChildren().removeIf(child -> child instanceof ResizeHandles);
+        } else {
+            getPresentationView().getChildren().removeIf(child -> child instanceof ResizeHandles && ((ResizeHandles) child).getElementView() == elementView);
+        }
     }
 
     // project support
@@ -239,6 +247,22 @@ public class Workbench extends StackPane {
 
     public final Element getSelectedElement() {
         return selectedElement.get();
+    }
+
+    // presentation view support
+
+    private final ObjectProperty<PresentationView> presentationView = new SimpleObjectProperty<>(this, "presentationView");
+
+    public final ObjectProperty<PresentationView> presentationViewProperty() {
+        return presentationView;
+    }
+
+    public final void setPresentationView(PresentationView view) {
+        this.presentationView.set(view);
+    }
+
+    public final PresentationView getPresentationView() {
+        return presentationView.get();
     }
 
     private MenuBar createMenuBar() {
@@ -404,21 +428,21 @@ public class Workbench extends StackPane {
     }
 
     private void playSlide() {
-        presentationView.setStatus(Status.PLAY);
+        getPresentationView().setStatus(Status.PLAY);
     }
 
     private void pauseSlide() {
-        presentationView.setStatus(Status.PAUSED);
+        getPresentationView().setStatus(Status.PAUSED);
     }
 
     private void stop() {
-        presentationView.setStatus(Status.STOPPED);
+        getPresentationView().setStatus(Status.STOPPED);
     }
 
     private void updateSlide() {
-        if (presentationView != null) {
-            Bindings.unbindBidirectional(presentationView.currentSlideProperty(), selectedSlideProperty());
-            presentationView.destroy();
+        if (getPresentationView() != null) {
+            Bindings.unbindBidirectional(getPresentationView().currentSlideProperty(), selectedSlideProperty());
+            getPresentationView().destroy();
         }
 
         Project project = getProject();
@@ -428,15 +452,15 @@ public class Workbench extends StackPane {
             return;
         }
 
-        presentationView = new PresentationView(project, presentation);
+        setPresentationView(new PresentationView(project, presentation));
 
-        installHandlers(presentationView);
+        installHandlers(getPresentationView());
 
         //presentationView.addEventFilter(MouseEvent.MOUSE_CLICKED, evt -> propertySheet.getItems().setAll(BeanPropertyUtils.getProperties(getPresentation())));
-        Bindings.bindBidirectional(presentationView.currentSlideProperty(), selectedSlideProperty());
+        Bindings.bindBidirectional(getPresentationView().currentSlideProperty(), selectedSlideProperty());
 
-        presentationView.statusProperty().addListener(it -> {
-            switch (presentationView.getStatus()) {
+        getPresentationView().statusProperty().addListener(it -> {
+            switch (getPresentationView().getStatus()) {
                 case PLAY:
                     playSlide.setText("Pause");
                     break;
@@ -451,19 +475,19 @@ public class Workbench extends StackPane {
 
         switch (presentation.getLayout()) {
             case FILL:
-                BorderPane.setAlignment(presentationView, Pos.CENTER);
+                BorderPane.setAlignment(getPresentationView(), Pos.CENTER);
                 StackPane presentationWrapper = new StackPane();
                 presentationWrapper.getStyleClass().add("presentation-wrapper");
-                presentationWrapper.getChildren().add(presentationView);
+                presentationWrapper.getChildren().add(getPresentationView());
                 presentationMasterDetailPane.setMasterNode(presentationWrapper);
                 break;
             case FIXED_HEIGHT:
             case FIXED_WIDTH:
             case FIXED_SIZE:
                 StackPane content = new StackPane();
-                content.getChildren().add(presentationView);
-                StackPane.setAlignment(presentationView, Pos.CENTER);
-                presentationView.setEffect(new DropShadow(20, Color.BLACK));
+                content.getChildren().add(getPresentationView());
+                StackPane.setAlignment(getPresentationView(), Pos.CENTER);
+                getPresentationView().setEffect(new DropShadow(20, Color.BLACK));
                 ScrollPane scrollPane = new ScrollPane(content);
                 scrollPane.setFitToHeight(true);
                 scrollPane.setFitToWidth(true);
@@ -476,7 +500,7 @@ public class Workbench extends StackPane {
 
     private void installHandlers(PresentationView presentationView) {
 
-        presentationView.addEventFilter(MouseEvent.MOUSE_CLICKED, evt -> {
+        getPresentationView().addEventFilter(MouseEvent.MOUSE_CLICKED, evt -> {
             if (evt.getClickCount() == 1 && evt.getButton().equals(MouseButton.PRIMARY)) {
                 Object object = evt.getTarget();
                 if (object instanceof ElementView) {
@@ -488,7 +512,7 @@ public class Workbench extends StackPane {
             }
         });
 
-        presentationView.addEventFilter(MouseEvent.MOUSE_PRESSED, evt -> {
+        getPresentationView().addEventFilter(MouseEvent.MOUSE_PRESSED, evt -> {
             if (evt.getClickCount() == 1 && evt.getButton().equals(MouseButton.PRIMARY)) {
                 Object object = evt.getTarget();
 
@@ -511,7 +535,7 @@ public class Workbench extends StackPane {
             presentationView.requestFocus();
         });
 
-        presentationView.addEventFilter(MouseEvent.MOUSE_DRAGGED, evt -> {
+        getPresentationView().addEventFilter(MouseEvent.MOUSE_DRAGGED, evt -> {
             Object object = evt.getTarget();
 
             ElementView elementView = null;
@@ -532,7 +556,7 @@ public class Workbench extends StackPane {
             }
         });
 
-        presentationView.addEventFilter(DragEvent.DRAG_OVER, evt -> {
+        getPresentationView().addEventFilter(DragEvent.DRAG_OVER, evt -> {
             Dragboard db = evt.getDragboard();
             if (db.hasFiles()) {
                 evt.acceptTransferModes(TransferMode.COPY);
@@ -541,7 +565,7 @@ public class Workbench extends StackPane {
             }
         });
 
-        presentationView.addEventHandler(DragEvent.DRAG_DROPPED, evt -> {
+        getPresentationView().addEventHandler(DragEvent.DRAG_DROPPED, evt -> {
             Dragboard db = evt.getDragboard();
             boolean success = false;
             if (db.hasFiles()) {
@@ -587,7 +611,7 @@ public class Workbench extends StackPane {
             evt.consume();
         });
 
-        presentationView.addEventFilter(KeyEvent.KEY_PRESSED, evt -> {
+        getPresentationView().addEventFilter(KeyEvent.KEY_PRESSED, evt -> {
             if (evt.getCode().equals(KeyCode.BACK_SPACE)) {
                 Element element = getSelectedElement();
                 if (element != null) {

@@ -1,5 +1,6 @@
 package com.animaker.model.transition;
 
+import com.animaker.model.ModelObject;
 import com.animaker.view.ElementView;
 import javafx.animation.Interpolator;
 import javafx.animation.Timeline;
@@ -12,16 +13,12 @@ import java.util.Objects;
 /**
  * Created by lemmi on 19.12.16.
  */
-public abstract class Transition {
+public abstract class Transition extends ModelObject {
 
     private String name;
 
     public Transition(String name) {
-        this.name = Objects.requireNonNull(name);
-    }
-
-    public final String getName() {
-        return name;
+        setName(name);
     }
 
     private final ObjectProperty<Duration> delay = new SimpleObjectProperty<>(this, "delay", Duration.ZERO);

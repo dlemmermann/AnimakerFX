@@ -13,7 +13,13 @@ public abstract class SlideControlBase extends StackPane {
 
     protected SlideControlBase(Workbench workbench) {
         this.workbench = workbench;
+
+        slideProperty().bind(workbench.selectedSlideProperty());
+
+        slideProperty().addListener((observable, oldSlide, newSlide) -> updateSlide(oldSlide, newSlide));
     }
+
+    protected abstract void updateSlide(Slide oldSlide, Slide newSlide);
 
     public final Workbench getWorkbench() {
         return workbench;

@@ -34,8 +34,11 @@ public class ResizeHandles extends StackPane {
         }
     }
 
-    public ResizeHandles(ElementView elementView) {
+    private Workbench workbench;
+
+    public ResizeHandles(Workbench workbench, ElementView elementView) {
         this.elementView = elementView;
+        this.workbench = workbench;
 
         Element element = elementView.getElement();
 
@@ -49,6 +52,12 @@ public class ResizeHandles extends StackPane {
             getChildren().add(handle);
             StackPane.setAlignment(handle, mode.getPos());
         }
+
+        elementView.sceneProperty().addListener(it -> {
+            if (elementView.getScene() == null) {
+                workbench.stopResize(elementView);
+            }
+        });
     }
 
     public ElementView getElementView() {
