@@ -7,6 +7,7 @@ import com.animaker.model.Project;
 import com.animaker.model.Slide;
 import com.animaker.model.elements.ImageElement;
 import com.animaker.model.elements.VideoElement;
+import com.animaker.model.transition.Play;
 import com.animaker.view.ElementView;
 import com.animaker.view.PresentationView;
 import com.animaker.view.PresentationView.Status;
@@ -48,6 +49,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
+import javafx.util.Duration;
 import org.controlsfx.control.MasterDetailPane;
 import org.controlsfx.control.PropertySheet;
 import org.controlsfx.property.BeanPropertyUtils;
@@ -323,6 +325,11 @@ public class Workbench extends StackPane {
         stopSlide.setOnAction(evt -> stop());
         bar.getItems().add(stopSlide);
 
+        // reset slide
+        Button resetSlide = new Button("Reset");
+        resetSlide.setOnAction(evt -> reset());
+        bar.getItems().add(resetSlide);
+
         return bar;
     }
 
@@ -437,6 +444,11 @@ public class Workbench extends StackPane {
 
     private void stop() {
         getPresentationView().setStatus(Status.STOPPED);
+    }
+
+    private void reset() {
+        getPresentationView().setStatus(Status.STOPPED);
+        getPresentationView().getCurrentSlideView().reset();
     }
 
     private void updateSlide() {
@@ -598,6 +610,11 @@ public class Workbench extends StackPane {
                                 // 16:9 aspect ratio is default
                                 videoElement.setWidth(320);
                                 videoElement.setHeight(180);
+
+                                Play play = new Play();
+                                play.setDuration(Duration.seconds(30));
+                                videoElement.getOpeningTransitions().add(play);
+
                                 slide.getElements().add(videoElement);
                             }
                         }

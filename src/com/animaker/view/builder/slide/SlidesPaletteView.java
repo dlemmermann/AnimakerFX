@@ -42,6 +42,7 @@ public class SlidesPaletteView extends StackPane {
         HBox hbox = new HBox();
         hbox.setFillHeight(true);
         hbox.setAlignment(Pos.CENTER_LEFT);
+        hbox.getStyleClass().add("button-bar");
 
         Node plusIcon = FontAwesomeIconFactory.get().createIcon(FontAwesomeIcon.PLUS);
         plusIcon.getStyleClass().add("palette-button");

@@ -7,13 +7,13 @@ import com.animaker.model.transition.Transition;
 import com.animaker.view.PresentationView;
 import com.animaker.view.SlideView;
 import com.animaker.view.builder.Workbench;
-import com.animaker.view.builder.slide.SlideControlBase;
 import javafx.animation.Timeline;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.WeakInvalidationListener;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.scene.Cursor;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeTableCell;
@@ -57,8 +57,6 @@ public class SlideTimelineView extends SlideControlBase {
         workbench.presentationViewProperty().addListener(it -> listenToPresentationView());
 
         timelineProperty().addListener(it -> currentTime.bind(getTimeline().currentTimeProperty()));
-
-        currentTime.addListener(it -> System.out.println(currentTime.get()));
     }
 
     private final InvalidationListener slideViewChangedListener = it -> slideChanged();
@@ -139,6 +137,31 @@ public class SlideTimelineView extends SlideControlBase {
         public TransitionPane() {
             timelineBar.setManaged(false);
             timelineBar.getStyleClass().add("transition-line");
+            timelineBar.setOnMousePressed(evt -> mouseX = evt.getSceneX());
+            timelineBar.setOnMouseDragged(evt -> {
+                double delta = evt.getSceneX() - mouseX;
+                final double newX = timelineBar.getLayoutX() + delta;
+                if (timelineBar.getCursor().equals(Cursor.MOVE)) {
+                    Duration duration = getDuration(newX, true);
+                    transition.get().setDelay(duration);
+                } else {
+                    Duration duration = getDuration(delta, false);
+                    Duration newDuration = transition.get().getDuration().add(duration);
+                    if (newDuration.lessThan(Duration.ZERO)) {
+                        newDuration = Duration.ZERO;
+                    }
+                    transition.get().setDuration(newDuration);
+                }
+                mouseX = evt.getSceneX();
+            });
+
+            timelineBar.setOnMouseMoved(evt -> {
+                if (evt.getX() > timelineBar.getWidth() - 5) {
+                    timelineBar.setCursor(Cursor.E_RESIZE);
+                } else {
+                    timelineBar.setCursor(Cursor.MOVE);
+                }
+            });
 
             currentTimeIndicator.setManaged(false);
             currentTimeIndicator.getStyleClass().add("current-time-indicator");
@@ -153,7 +176,7 @@ public class SlideTimelineView extends SlideControlBase {
                 Workbench workbench = getWorkbench();
                 PresentationView presentationView = workbench.getPresentationView();
                 SlideView slideView = presentationView.getCurrentSlideView();
-                slideView.jumpTo(getTimeAt(newX));
+                slideView.jumpTo(getDuration(newX, true));
             });
 
             getChildren().addAll(timelineBar, currentTimeIndicator);
@@ -163,10 +186,10 @@ public class SlideTimelineView extends SlideControlBase {
             currentTime.addListener(it -> requestLayout());
         }
 
-        private Duration getTimeAt(double x) {
+        private Duration getDuration(double x, boolean safe) {
             Duration duration = getVisibleDuration();
             double mpp = duration.toMillis() / getWidth();
-            return Duration.millis(x * mpp);
+            return Duration.millis(safe ? Math.max(0, x * mpp) : x * mpp);
         }
 
         private final InvalidationListener redrawListener = it -> requestLayout();

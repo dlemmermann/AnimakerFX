@@ -48,6 +48,19 @@ public abstract class ElementView<T extends Element> extends StackPane {
         return element;
     }
 
+    public final void reset() {
+        Element element = getElement();
+        setLayoutX(element.getLayoutX());
+        setLayoutY(element.getLayoutY());
+        setScaleX(element.getScaleX());
+        setScaleY(element.getScaleY());
+        setRotate(element.getRotation());
+        setOpacity(element.getOpacity());
+        setTranslateX(0);
+        setTranslateY(0);
+        resize(element.getWidth(), element.getHeight());
+    }
+
     public final void setupAnimation() {
         element.getOpeningTransitions().forEach(transition -> transition.setup(this));
     }

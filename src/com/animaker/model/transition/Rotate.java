@@ -7,9 +7,12 @@ import javafx.animation.Timeline;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 
+import javax.xml.bind.annotation.XmlType;
+
 /**
  * Created by lemmi on 19.12.16.
  */
+@XmlType(name = "rotate")
 public class Rotate extends Transition {
 
     public Rotate() {
@@ -18,7 +21,7 @@ public class Rotate extends Transition {
 
     // rotation
 
-    private final DoubleProperty rotation = new SimpleDoubleProperty(this, "rotation", 90);
+    private final DoubleProperty rotation = new SimpleDoubleProperty(this, "rotation", 360);
 
     public final DoubleProperty rotationProperty() {
         return rotation;

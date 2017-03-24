@@ -1,10 +1,16 @@
 package com.animaker.model;
 
+import com.animaker.model.transition.Blur;
+import com.animaker.model.transition.Drift;
 import com.animaker.model.transition.FadeIn;
+import com.animaker.model.transition.FadeOut;
 import com.animaker.model.transition.MoveIn;
-import com.animaker.model.transition.MoveIn.TransitionDirection;
+import com.animaker.model.transition.MoveOut;
+import com.animaker.model.transition.Parallax;
+import com.animaker.model.transition.Play;
+import com.animaker.model.transition.Rotate;
+import com.animaker.model.transition.Scale;
 import com.animaker.model.transition.Transition;
-import javafx.animation.Interpolator;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
@@ -16,27 +22,14 @@ import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
-import javafx.util.Duration;
+
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
+import javax.xml.bind.annotation.XmlElements;
 
 public abstract class Element extends ModelObject {
 
     public Element() {
-        final MoveIn moveIn = new MoveIn();
-        moveIn.setDirection(TransitionDirection.RIGHT_TO_LEFT);
-        moveIn.setDuration(Duration.seconds(1));
-        nameProperty().addListener(it -> {
-            if (getName().equals("ikea")) {
-                moveIn.setDirection(TransitionDirection.BOTTOM_TO_TOP);
-                moveIn.setDuration(Duration.seconds(2));
-                moveIn.setDelay(Duration.seconds(1));
-            }
-        });
-
-        moveIn.setInterpolator(Interpolator.EASE_IN);
-        FadeIn fadeIn = new FadeIn();
-        fadeIn.setDuration(Duration.seconds(1));
-        fadeIn.setDelay(Duration.seconds(.5));
-        getOpeningTransitions().addAll(moveIn, fadeIn);
     }
 
     public enum ElementType {
@@ -120,7 +113,7 @@ public abstract class Element extends ModelObject {
 
     // scale X
 
-    private final DoubleProperty scaleX = new SimpleDoubleProperty(this, "scaleX", 0);
+    private final DoubleProperty scaleX = new SimpleDoubleProperty(this, "scaleX", 1);
 
     public final DoubleProperty scaleXProperty() {
         return scaleX;
@@ -136,7 +129,7 @@ public abstract class Element extends ModelObject {
 
     // scale Y
 
-    private final DoubleProperty scaleY = new SimpleDoubleProperty(this, "scaleY", 0);
+    private final DoubleProperty scaleY = new SimpleDoubleProperty(this, "scaleY", 1);
 
     public final DoubleProperty scaleYProperty() {
         return scaleY;
@@ -154,20 +147,79 @@ public abstract class Element extends ModelObject {
 
     private final ObservableList<Transition> openingTransitions = FXCollections.observableArrayList();
 
+    @XmlElementWrapper(name = "opening-transitions")
+    @XmlElements({
+            @XmlElement(name = "blur", type = Blur.class),
+            @XmlElement(name = "drift", type = Drift.class),
+            @XmlElement(name = "fade-in", type = FadeIn.class),
+            @XmlElement(name = "fade-out", type = FadeOut.class),
+            @XmlElement(name = "move-in", type = MoveIn.class),
+            @XmlElement(name = "move-out", type = MoveOut.class),
+            @XmlElement(name = "parallax", type = Parallax.class),
+            @XmlElement(name = "play", type = Play.class),
+            @XmlElement(name = "rotate", type = Rotate.class),
+            @XmlElement(name = "scale", type = Scale.class)
+    })
     public final ObservableList<Transition> getOpeningTransitions() {
         return openingTransitions;
     }
 
     private final ObservableList<Transition> loopTransitions = FXCollections.observableArrayList();
 
+    @XmlElementWrapper(name = "loop-transitions")
+    @XmlElements({
+            @XmlElement(name = "blur", type = Blur.class),
+            @XmlElement(name = "drift", type = Drift.class),
+            @XmlElement(name = "fade-in", type = FadeIn.class),
+            @XmlElement(name = "fade-out", type = FadeOut.class),
+            @XmlElement(name = "move-in", type = MoveIn.class),
+            @XmlElement(name = "move-out", type = MoveOut.class),
+            @XmlElement(name = "parallax", type = Parallax.class),
+            @XmlElement(name = "play", type = Play.class),
+            @XmlElement(name = "rotate", type = Rotate.class),
+            @XmlElement(name = "scale", type = Scale.class)
+    })
     public final ObservableList<Transition> getLoopTransitions() {
         return loopTransitions;
     }
 
     private final ObservableList<Transition> closingTransitions = FXCollections.observableArrayList();
 
+    @XmlElementWrapper(name = "closing-transitions")
+    @XmlElements({
+            @XmlElement(name = "blur", type = Blur.class),
+            @XmlElement(name = "drift", type = Drift.class),
+            @XmlElement(name = "fade-in", type = FadeIn.class),
+            @XmlElement(name = "fade-out", type = FadeOut.class),
+            @XmlElement(name = "move-in", type = MoveIn.class),
+            @XmlElement(name = "move-out", type = MoveOut.class),
+            @XmlElement(name = "parallax", type = Parallax.class),
+            @XmlElement(name = "play", type = Play.class),
+            @XmlElement(name = "rotate", type = Rotate.class),
+            @XmlElement(name = "scale", type = Scale.class)
+    })
     public final ObservableList<Transition> getClosingTransitions() {
         return closingTransitions;
+    }
+
+    private final ObservableList<Transition> hoverTransitions = FXCollections.observableArrayList();
+
+    @XmlElementWrapper(name = "hover-transitions")
+    @XmlElements({
+            @XmlElement(name = "blur", type = Blur.class),
+            @XmlElement(name = "drift", type = Drift.class),
+            @XmlElement(name = "fade-in", type = FadeIn.class),
+            @XmlElement(name = "fade-out", type = FadeOut.class),
+            @XmlElement(name = "move-in", type = MoveIn.class),
+            @XmlElement(name = "move-out", type = MoveOut.class),
+            @XmlElement(name = "parallax", type = Parallax.class),
+            @XmlElement(name = "play", type = Play.class),
+            @XmlElement(name = "rotate", type = Rotate.class),
+            @XmlElement(name = "scale", type = Scale.class)
+    })
+
+    public final ObservableList<Transition> getHoverTransitions() {
+        return hoverTransitions;
     }
 
     // layoutStrategy support

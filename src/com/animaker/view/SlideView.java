@@ -87,6 +87,8 @@ public class SlideView extends Pane {
         slide.backgroundImageFileNameProperty().addListener(it -> updateBackgroundImage());
         buildSlide();
         updateBackgroundImage();
+
+        timeline.totalDurationProperty().addListener(it -> System.out.println("total duration: " + timeline.getTotalDuration()));
     }
 
     public Timeline getTimeline() {
@@ -248,15 +250,22 @@ public class SlideView extends Pane {
         return slide;
     }
 
+    public final void reset() {
+        final List<ElementView> elementViews = getElementViews();
+        elementViews.forEach(view -> view.reset());
+    }
+
     public final void play() {
         if (timeline.getStatus().equals(Worker.State.RUNNING)) {
             timeline.stop();
-            timeline.getKeyFrames().clear();
         }
+
+        timeline.getKeyFrames().clear();
 
         final List<ElementView> elementViews = getElementViews();
         elementViews.forEach(view -> view.setupAnimation());
         elementViews.forEach(view -> view.configureAnimation(timeline));
+        System.out.println("key frame count: " + timeline.getKeyFrames().size());
 
         timeline.playFromStart();
     }
@@ -264,8 +273,9 @@ public class SlideView extends Pane {
     public final void jumpTo(Duration duration) {
         if (timeline.getStatus().equals(Worker.State.RUNNING)) {
             timeline.stop();
-            timeline.getKeyFrames().clear();
         }
+
+        timeline.getKeyFrames().clear();
 
         final List<ElementView> elementViews = getElementViews();
         elementViews.forEach(view -> view.setupAnimation());

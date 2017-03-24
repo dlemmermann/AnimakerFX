@@ -67,6 +67,7 @@ public class ElementsPaletteView extends SlideControlBase {
         HBox hbox = new HBox();
         hbox.setFillHeight(true);
         hbox.setAlignment(Pos.CENTER_LEFT);
+        hbox.getStyleClass().add("button-bar");
 
         Node plusIcon = FontAwesomeIconFactory.get().createIcon(FontAwesomeIcon.PLUS);
         plusIcon.getStyleClass().add("palette-button");
@@ -82,7 +83,7 @@ public class ElementsPaletteView extends SlideControlBase {
         addLayerButton.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
         hbox.getChildren().add(addLayerButton);
 
-        Label title = new Label("Layers");
+        Label title = new Label("Elements");
         title.setMaxWidth(Double.MAX_VALUE);
         title.getStyleClass().add("palette-title");
         BorderPane borderPane = new BorderPane();

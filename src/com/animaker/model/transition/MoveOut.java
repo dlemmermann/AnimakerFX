@@ -9,20 +9,10 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 
-public class MoveOut extends Transition {
+import javax.xml.bind.annotation.XmlType;
 
-    public enum TransitionDirection {
-
-        LEFT_TO_RIGHT,
-        RIGHT_TO_LEFT,
-        TOP_TO_BOTTOM,
-        BOTTOM_TO_TOP,
-        TOP_LEFT_TO_BOTTOM_RIGHT,
-        TOP_RIGHT_TO_BOTTOM_LEFT,
-        BOTTOM_LEFT_TO_TOP_RIGHT,
-        BOTTOM_RIGHT_TO_TOP_LEFT
-
-    }
+@XmlType(name = "move-out")
+public class MoveOut extends Move {
 
     public MoveOut() {
         super("Move Out");

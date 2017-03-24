@@ -9,9 +9,12 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
 
+import javax.xml.bind.annotation.XmlType;
+
 /**
  * Created by lemmi on 19.12.16.
  */
+@XmlType(name = "scale")
 public class Scale extends Transition {
 
     public enum ScaleDirection {

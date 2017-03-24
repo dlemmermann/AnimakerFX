@@ -1,6 +1,8 @@
 package com.animaker.model.transition;
 
 import com.animaker.model.ModelObject;
+import com.animaker.model.util.DurationXMLAdapter;
+import com.animaker.model.util.InterpolatorXMLAdapter;
 import com.animaker.view.ElementView;
 import javafx.animation.Interpolator;
 import javafx.animation.Timeline;
@@ -8,16 +10,31 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.util.Duration;
 
-import java.util.Objects;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 /**
  * Created by lemmi on 19.12.16.
  */
 public abstract class Transition extends ModelObject {
 
-    private String name;
+    public enum TransitionType {
+        BLUR,
+        DRIFT,
+        FADE_IN,
+        FADE_OUT,
+        MOVE_IN,
+        MOVE_OUT,
+        PARALLAX,
+        PLAY,
+        ROTATE,
+        SCALE
+    }
+
+    public Transition() {
+    }
 
     public Transition(String name) {
+        durationProperty().addListener(it -> System.out.println("setting duration on " + getName() + " to " + getDuration()));
         setName(name);
     }
 
@@ -31,6 +48,7 @@ public abstract class Transition extends ModelObject {
         this.delay.set(delay);
     }
 
+    @XmlJavaTypeAdapter(DurationXMLAdapter.class)
     public final Duration getDelay() {
         return delay.get();
     }
@@ -47,6 +65,7 @@ public abstract class Transition extends ModelObject {
         this.duration.set(delay);
     }
 
+    @XmlJavaTypeAdapter(DurationXMLAdapter.class)
     public final Duration getDuration() {
         return duration.get();
     }
@@ -61,6 +80,7 @@ public abstract class Transition extends ModelObject {
         this.interpolator.set(interpolator);
     }
 
+    @XmlJavaTypeAdapter(InterpolatorXMLAdapter.class)
     public final Interpolator getInterpolator() {
         return interpolator.get();
     }

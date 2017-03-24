@@ -7,24 +7,13 @@ import javafx.animation.Timeline;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 
+import javax.xml.bind.annotation.XmlType;
+
 /**
  * Created by lemmi on 19.12.16.
  */
-public class FadeOut extends Transition {
-
-    public enum TextDelivery {
-        BY_WORD,
-        BY_OBJECT,
-        BY_CHARACTER
-    }
-
-    public enum TextDirection {
-        FORWARD,
-        BACKWARD,
-        FROM_CENTER,
-        FROM_EDGES,
-        RANDOM
-    }
+@XmlType(name = "fade-out")
+public class FadeOut extends Fade {
 
     public FadeOut() {
         super("FadeIn");

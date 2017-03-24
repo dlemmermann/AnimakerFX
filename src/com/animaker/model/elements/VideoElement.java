@@ -18,10 +18,6 @@ public class VideoElement extends Element {
 
     public VideoElement() {
         super();
-
-        Play play = new Play();
-        play.setDuration(Duration.seconds(30));
-        getOpeningTransitions().add(play);
     }
 
     @Override

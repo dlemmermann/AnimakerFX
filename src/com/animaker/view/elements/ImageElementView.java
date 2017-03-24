@@ -4,6 +4,7 @@ import com.animaker.model.elements.ImageElement;
 import com.animaker.model.elements.VideoElement;
 import com.animaker.view.ElementView;
 import com.animaker.view.SlideView;
+import javafx.scene.CacheHint;
 import javafx.scene.Node;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;

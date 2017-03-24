@@ -6,9 +6,12 @@ import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
 import javafx.util.Duration;
 
+import javax.xml.bind.annotation.XmlType;
+
 /**
  * Created by lemmi on 28.02.17.
  */
+@XmlType(name = "play")
 public class Play extends Transition {
 
     public Play() {

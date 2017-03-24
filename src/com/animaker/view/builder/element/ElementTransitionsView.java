@@ -1,9 +1,9 @@
 package com.animaker.view.builder.element;
 
 import com.animaker.model.Element;
+import com.animaker.model.elements.ImageElement;
 import com.animaker.view.builder.Workbench;
-import javafx.geometry.Orientation;
-import javafx.scene.control.Separator;
+import com.animaker.view.builder.element.TransitionSettingsView.TransitionLocationType;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 
@@ -15,18 +15,19 @@ public class ElementTransitionsView extends ElementSettingsView<Element> {
     public ElementTransitionsView(Workbench workbench) {
         super(workbench);
 
-        TransitionSettingsView openingTransition = new TransitionSettingsView(workbench, "Opening");
-        TransitionSettingsView loopTransition = new TransitionSettingsView(workbench, "Loop");
-        TransitionSettingsView endingTransition = new TransitionSettingsView(workbench, "Ending");
-        TransitionSettingsView hoverTransition = new TransitionSettingsView(workbench, "Hover");
-        TransitionSettingsView parallaxTransition = new TransitionSettingsView(workbench, "Parallax");
+        TransitionSettingsView openingTransition = new TransitionSettingsView(workbench, "Opening", TransitionLocationType.OPENING);
+        TransitionSettingsView loopTransition = new TransitionSettingsView(workbench, "Loop", TransitionLocationType.SHOWING);
+        TransitionSettingsView endingTransition = new TransitionSettingsView(workbench, "Ending", TransitionLocationType.CLOSING);
+        TransitionSettingsView hoverTransition = new TransitionSettingsView(workbench, "Hover", TransitionLocationType.HOVER);
+        TransitionSettingsView parallaxTransition = new TransitionSettingsView(workbench, "Parallax", TransitionLocationType.PARALLAX);
 
-        Separator sep1 = new Separator(Orientation.VERTICAL);
-        Separator sep2 = new Separator(Orientation.VERTICAL);
-        Separator sep3 = new Separator(Orientation.VERTICAL);
-        Separator sep4 = new Separator(Orientation.VERTICAL);
+        openingTransition.elementProperty().bind(elementProperty());
+        loopTransition.elementProperty().bind(elementProperty());
+        endingTransition.elementProperty().bind(elementProperty());
+        hoverTransition.elementProperty().bind(elementProperty());
+        parallaxTransition.elementProperty().bind(elementProperty());
 
-        HBox hBox = new HBox(10);
+        HBox hBox = new HBox();
         hBox.setFillHeight(true);
 
         HBox.setHgrow(openingTransition, Priority.ALWAYS);
@@ -35,10 +36,10 @@ public class ElementTransitionsView extends ElementSettingsView<Element> {
         HBox.setHgrow(hoverTransition, Priority.ALWAYS);
         HBox.setHgrow(parallaxTransition, Priority.ALWAYS);
 
-        hBox.getChildren().setAll(openingTransition, sep1,
-                loopTransition, sep2,
-                endingTransition, sep3,
-                hoverTransition, sep4,
+        hBox.getChildren().setAll(openingTransition,
+                loopTransition,
+                endingTransition,
+                hoverTransition,
                 parallaxTransition);
 
         getChildren().setAll(hBox);
@@ -46,8 +47,9 @@ public class ElementTransitionsView extends ElementSettingsView<Element> {
         elementProperty().bind(workbench.selectedElementProperty());
     }
 
+
     @Override
     protected void update(Element oldElement, Element newElement) {
-
+        System.out.println("updated " + newElement);
     }
 }

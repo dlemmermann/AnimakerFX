@@ -211,3 +211,8 @@
     -fx-stroke-width: 4px;
     -fx-cursor: w_resize;
 }
+
+.button-bar {
+    -fx-padding: 5px;
+    -fx-spacing: 5px;
+}
