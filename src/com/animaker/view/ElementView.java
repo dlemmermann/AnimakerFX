@@ -62,11 +62,19 @@ public abstract class ElementView<T extends Element> extends StackPane {
     }
 
     public final void setupAnimation() {
-        element.getOpeningTransitions().forEach(transition -> transition.setup(this));
+        element.getOpeningTransitions().forEach(transition -> {
+            if (transition.isEnabled()) {
+                transition.setup(this);
+            }
+        });
     }
 
     public final void configureAnimation(Timeline timeline) {
-        element.getOpeningTransitions().forEach(transition -> transition.configure(this, timeline));
+        element.getOpeningTransitions().forEach(transition -> {
+            if (transition.isEnabled()) {
+                transition.configure(this, timeline);
+            }
+        });
     }
 
     // play support (for media)

@@ -216,3 +216,30 @@
     -fx-padding: 5px;
     -fx-spacing: 5px;
 }
+
+.play-button {
+    -fx-fill: lightgreen;
+}
+
+.pause-button {
+    -fx-fill: orange;
+}
+
+.stop-button {
+    -fx-fill: red;
+}
+
+.clear-button {
+    -fx-fill: white;
+    -fx-translate-x: -2;
+    -fx-cursor: hand;
+    -fx-font-size: 1.2em;
+}
+
+.clear-button:hover {
+    -fx-fill: red;
+}
+
+.clear-button:presed {
+    -fx-fill: darkred;
+}

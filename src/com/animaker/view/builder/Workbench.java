@@ -15,15 +15,19 @@ import com.animaker.view.builder.ResizeHandles.ResizeHandle;
 import com.animaker.view.builder.element.ElementsPaletteView;
 import com.animaker.view.builder.element.ElementSettingsTabPane;
 import com.animaker.view.builder.slide.SlidesPaletteView;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
+import de.jensd.fx.glyphs.fontawesome.utils.FontAwesomeIconFactory;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.geometry.Pos;
 import javafx.geometry.Side;
+import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
@@ -48,6 +52,7 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.util.Duration;
 import org.controlsfx.control.MasterDetailPane;
@@ -77,7 +82,9 @@ public class Workbench extends StackPane {
     private MasterDetailPane presentationMasterDetailPane;
     private ElementSettingsTabPane layerSettingsView;
 
-    private Button playSlide;
+    private Button playSlideButton;
+    private Node playIcon;
+    private Node pauseIcon;
 
     public Workbench() {
         getStyleClass().add("workbench");
@@ -309,19 +316,37 @@ public class Workbench extends StackPane {
         bar.getItems().add(addSlide);
 
         // play slide
-        playSlide = new Button("Play");
-        playSlide.setOnAction(evt -> {
-            if (playSlide.getText().equals("Pause")) {
-                pauseSlide();
+
+        playIcon = FontAwesomeIconFactory.get().createIcon(FontAwesomeIcon.PLAY);
+        playIcon.getStyleClass().add("play-button");
+
+        pauseIcon = FontAwesomeIconFactory.get().createIcon(FontAwesomeIcon.PAUSE);
+        pauseIcon.getStyleClass().add("pause-button");
+
+        playSlideButton = new Button();
+        playSlideButton.setGraphic(playIcon);
+        playSlideButton.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+        playSlideButton.setOnAction(evt -> {
+            if (playSlideButton.getGraphic().equals(pauseIcon)) {
+                if (getPresentationView().getStatus().equals(Status.PAUSED)) {
+                    playSlide();
+                } else {
+                    pauseSlide();
+                }
             } else {
                 playSlide();
             }
         });
 
-        bar.getItems().add(playSlide);
+        bar.getItems().add(playSlideButton);
 
         // stop slide
-        Button stopSlide = new Button("Stop");
+        Node stopIcon = FontAwesomeIconFactory.get().createIcon(FontAwesomeIcon.STOP);
+        stopIcon.getStyleClass().add("stop-button");
+
+        Button stopSlide = new Button();
+        stopSlide.setGraphic(stopIcon);
+        stopSlide.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
         stopSlide.setOnAction(evt -> stop());
         bar.getItems().add(stopSlide);
 
@@ -474,13 +499,13 @@ public class Workbench extends StackPane {
         getPresentationView().statusProperty().addListener(it -> {
             switch (getPresentationView().getStatus()) {
                 case PLAY:
-                    playSlide.setText("Pause");
+                    playSlideButton.setGraphic(pauseIcon);
                     break;
                 case PAUSED:
-                    playSlide.setText("Resume");
+                    playSlideButton.setGraphic(pauseIcon);
                     break;
                 case STOPPED:
-                    playSlide.setText("Play");
+                    playSlideButton.setGraphic(playIcon);
                     break;
             }
         });

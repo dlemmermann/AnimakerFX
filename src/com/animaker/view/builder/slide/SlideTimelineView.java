@@ -19,6 +19,7 @@ import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeTableCell;
 import javafx.scene.control.TreeTableColumn;
 import javafx.scene.control.TreeTableView;
+import javafx.scene.control.cell.CheckBoxTreeTableCell;
 import javafx.scene.control.cell.TreeItemPropertyValueFactory;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
@@ -35,7 +36,7 @@ public class SlideTimelineView extends SlideControlBase {
 
     private TreeTableView<Slide> treeTableView;
 
-    private Duration visibleDuration = Duration.seconds(5);
+    private Duration visibleDuration = Duration.seconds(20);
 
     public SlideTimelineView(Workbench workbench) {
         super(workbench);
@@ -44,14 +45,21 @@ public class SlideTimelineView extends SlideControlBase {
         nameColumn.setCellValueFactory(new TreeItemPropertyValueFactory<>("name"));
         nameColumn.setPrefWidth(200);
 
+        TreeTableColumn<Slide, Boolean> enabledColumn = new TreeTableColumn<>("S");
+        enabledColumn.setCellFactory(CheckBoxTreeTableCell.forTreeTableColumn(enabledColumn));
+        enabledColumn.setEditable(true);
+        enabledColumn.setCellValueFactory(new TreeItemPropertyValueFactory<>("enabled"));
+        enabledColumn.setPrefWidth(30);
+
         TreeTableColumn<Slide, ModelObject> timelineColumn = new TreeTableColumn<>("Timeline");
         timelineColumn.setCellValueFactory(new TreeItemPropertyValueFactory<>("self"));
         timelineColumn.setCellFactory(column -> new TimelineCell());
         timelineColumn.setPrefWidth(900);
 
         treeTableView = new TreeTableView<>();
+        treeTableView.setEditable(true);
         treeTableView.setShowRoot(false);
-        treeTableView.getColumns().setAll(nameColumn, timelineColumn);
+        treeTableView.getColumns().setAll(nameColumn, enabledColumn, timelineColumn);
         getChildren().add(treeTableView);
 
         workbench.presentationViewProperty().addListener(it -> listenToPresentationView());
@@ -236,7 +244,7 @@ public class SlideTimelineView extends SlideControlBase {
                 timelineBar.setVisible(false);
             }
 
-            double timeX = 0;
+            double timeX;
 
             Duration time = currentTime.get();
             if (time != null) {

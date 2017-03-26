@@ -6,7 +6,9 @@ import com.animaker.model.util.InterpolatorXMLAdapter;
 import com.animaker.view.ElementView;
 import javafx.animation.Interpolator;
 import javafx.animation.Timeline;
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.util.Duration;
 
@@ -34,9 +36,26 @@ public abstract class Transition extends ModelObject {
     }
 
     public Transition(String name) {
-        durationProperty().addListener(it -> System.out.println("setting duration on " + getName() + " to " + getDuration()));
         setName(name);
     }
+
+    // enabled support
+
+    private final BooleanProperty enabled = new SimpleBooleanProperty(this, "enabled", true);
+
+    public final BooleanProperty enabledProperty() {
+        return enabled;
+    }
+
+    public final void setEnabled(boolean enabled) {
+        this.enabled.set(enabled);
+    }
+
+    public boolean isEnabled() {
+        return enabled.get();
+    }
+
+    // delay support
 
     private final ObjectProperty<Duration> delay = new SimpleObjectProperty<>(this, "delay", Duration.ZERO);
 

@@ -1,6 +1,8 @@
 package com.animaker.view.builder;
 
 import com.animaker.model.Project;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
+import de.jensd.fx.glyphs.fontawesome.utils.FontAwesomeIconFactory;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyStringProperty;
@@ -10,10 +12,14 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
-import javafx.scene.control.TextField;
+import javafx.scene.input.DragEvent;
+import javafx.scene.input.Dragboard;
+import javafx.scene.input.TransferMode;
 import javafx.scene.layout.HBox;
+import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
+import org.controlsfx.control.textfield.CustomTextField;
 
 import java.io.File;
 
@@ -27,7 +33,12 @@ public class FileSelectionField extends HBox {
 
         setAlignment(Pos.BASELINE_LEFT);
 
-        TextField textField = new TextField();
+        Text icon = FontAwesomeIconFactory.get().createIcon(FontAwesomeIcon.TIMES_CIRCLE);
+        icon.getStyleClass().add("clear-button");
+        icon.setOnMouseClicked(evt -> setFile(null));
+
+        CustomTextField textField = new CustomTextField();
+        textField.setRight(icon);
         textField.setEditable(false);
         textField.textProperty().bind(fileNameProperty());
 
@@ -44,6 +55,31 @@ public class FileSelectionField extends HBox {
                 fileName.set(null);
             }
         });
+
+        addEventFilter(DragEvent.DRAG_OVER, evt -> {
+            Dragboard db = evt.getDragboard();
+            if (db.hasFiles()) {
+                evt.acceptTransferModes(TransferMode.COPY);
+            } else {
+                evt.consume();
+            }
+        });
+
+        addEventHandler(DragEvent.DRAG_DROPPED, evt -> {
+            Dragboard db = evt.getDragboard();
+            boolean success = false;
+            if (db.hasFiles()) {
+                success = true;
+
+                if (!db.getFiles().isEmpty()) {
+                    addFileToProject(db.getFiles().get(0));
+                }
+            }
+
+            evt.setDropCompleted(success);
+            evt.consume();
+        });
+
     }
 
     private FileChooser fileChooser;
@@ -56,10 +92,14 @@ public class FileSelectionField extends HBox {
 
         File file = fileChooser.showOpenDialog(getScene().getWindow());
         if (file != null) {
-            Project project = getProject();
-            project.addFile(file);
-            setFile(file);
+            addFileToProject(file);
         }
+    }
+
+    private void addFileToProject(File file) {
+        Project project = getProject();
+        project.addFile(file);
+        setFile(file);
     }
 
     /**
