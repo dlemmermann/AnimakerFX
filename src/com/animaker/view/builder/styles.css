@@ -138,11 +138,12 @@
     -fx-padding: 20px;
 }
 
-.workbench .presentation {
+.transparency {
+    -fx-background-image: url("transparency-tile.png");
+    -fx-background-repeat: repeat;
 }
 
-.empty-background-presentation {
-    -fx-background-color: green;
+.workbench .presentation {
 }
 
 .resize-handle {
@@ -240,6 +241,6 @@
     -fx-fill: red;
 }
 
-.clear-button:presed {
+.clear-button:pressed {
     -fx-fill: darkred;
 }

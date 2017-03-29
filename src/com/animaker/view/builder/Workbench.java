@@ -489,7 +489,9 @@ public class Workbench extends StackPane {
             return;
         }
 
-        setPresentationView(new PresentationView(project, presentation));
+        PresentationView presentationView = new PresentationView(project, presentation);
+        presentationView.getStyleClass().add("transparent-background");
+        setPresentationView(presentationView);
 
         installHandlers(getPresentationView());
 
@@ -515,14 +517,14 @@ public class Workbench extends StackPane {
                 BorderPane.setAlignment(getPresentationView(), Pos.CENTER);
                 StackPane presentationWrapper = new StackPane();
                 presentationWrapper.getStyleClass().add("presentation-wrapper");
-                presentationWrapper.getChildren().add(getPresentationView());
+                presentationWrapper.getChildren().add(addTransparent(getPresentationView()));
                 presentationMasterDetailPane.setMasterNode(presentationWrapper);
                 break;
             case FIXED_HEIGHT:
             case FIXED_WIDTH:
             case FIXED_SIZE:
                 StackPane content = new StackPane();
-                content.getChildren().add(getPresentationView());
+                content.getChildren().add(addTransparent(getPresentationView()));
                 StackPane.setAlignment(getPresentationView(), Pos.CENTER);
                 getPresentationView().setEffect(new DropShadow(20, Color.BLACK));
                 ScrollPane scrollPane = new ScrollPane(content);
@@ -531,6 +533,12 @@ public class Workbench extends StackPane {
                 presentationMasterDetailPane.setMasterNode(scrollPane);
                 break;
         }
+    }
+
+    private StackPane addTransparent(PresentationView view) {
+        StackPane stackPane = new StackPane(view);
+        stackPane.getStyleClass().add("transparency");
+        return stackPane;
     }
 
     private double mouseX, mouseY;

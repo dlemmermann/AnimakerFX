@@ -156,7 +156,6 @@ public class PresentationView extends Pane {
     private void updateBackgroundImage() {
         String fileName = presentation.getImageFileName();
         if (fileName != null) {
-            getStyleClass().remove("empty-background-presentation");
             Project project = getProject();
             File file = project.getFile(fileName);
             try (FileInputStream in = new FileInputStream(file)) {
@@ -176,7 +175,7 @@ public class PresentationView extends Pane {
                 ex.printStackTrace();
             }
         } else {
-            getStyleClass().add("empty-background-presentation");
+            setBackground(null);
         }
     }
 

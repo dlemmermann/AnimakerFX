@@ -1,15 +1,10 @@
 package com.animaker.model.elements;
 
 import com.animaker.model.Element;
-import com.animaker.model.transition.FadeIn;
-import com.animaker.model.transition.MoveIn;
-import com.animaker.model.transition.MoveIn.TransitionDirection;
-import javafx.animation.Interpolator;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
-import javafx.util.Duration;
 
 import javax.xml.bind.annotation.XmlType;
 
