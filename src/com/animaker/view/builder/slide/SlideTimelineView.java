@@ -110,7 +110,11 @@ public class SlideTimelineView extends SlideControlBase {
 
     @Override
     protected void updateSlide(Slide oldSlide, Slide newSlide) {
-        treeTableView.setRoot(new SlideItem(newSlide));
+        if (newSlide != null) {
+            treeTableView.setRoot(new SlideItem(newSlide));
+        } else {
+            treeTableView.setRoot(null);
+        }
     }
 
     class TimelineCell extends TreeTableCell<Slide, ModelObject> {
