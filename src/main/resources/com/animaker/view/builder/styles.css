@@ -1,0 +1,263 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+.root {
+    -fx-base: rgba(60, 63, 65, 255);
+    -fx-font-family: Arial;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-font-smoothing-type: lcd;
+    -fx-focus-color: derive(-emphasize, 40%);
+    -emphasize: rgba(69, 78, 95, 1);
+}
+
+.presentation-settings-view {
+    -fx-padding: 10px;
+    -fx-background-color: -fx-base;
+    -fx-border-color: black;
+    -fx-border-width: 1 0 0 0;
+}
+
+.label {
+    -fx-text-fill: white;
+}
+
+.split-pane-divider {
+    -fx-background-color: -fx-base;
+    -fx-border-color: black;
+}
+
+.split-pane:vertical .split-pane-divider {
+    -fx-border-width: .5 0 .5 0;
+}
+
+.split-pane:horizontal .split-pane-divider {
+    -fx-border-width: 0 .5 0 .5;
+}
+
+.palette {
+    -fx-background-color: -fx-base;
+}
+
+.palette .list-cell:odd,
+.palette .list-cell:even {
+    -fx-border-width: 0 0 0 5;
+    -fx-border-color: transparent;
+    -fx-background-color: -fx-base;
+    -fx-text-fill: -fx-light-text-color;
+}
+
+.palette .list-cell:selected {
+    -fx-border-color: burlywood;
+    -fx-border-width: 0 0 0 5;
+}
+
+.list-cell .textfield {
+    -fx-background-color: transparent;
+}
+
+.property-sheet .viewport, .property-pane {
+    -fx-background-color: -fx-base;
+}
+
+.tab-header-area {
+    -fx-padding: 0;
+}
+
+.tab-header-background {
+    -fx-padding: 0;
+    -fx-background-color: -emphasize;
+}
+
+.headers-region {
+    -fx-padding: 0;
+    -fx-spacing: 0;
+}
+
+.tab {
+    -fx-padding: 2 10 2 10;
+    -fx-font-size: 1em;
+    -fx-background-color: transparent;
+    -fx-background-radius: 0;
+    -fx-border-insets: 0, 1;
+    -fx-border-color: transparent rgba(0, 0, 0, .1) transparent transparent, transparent rgba(255, 255, 255, .1) transparent transparent;
+}
+
+.tab:selected {
+    -fx-background-color: rgba(255, 255, 255, .2);
+}
+
+.tab .text {
+    -fx-fill: white;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.6), 5, 0.0, 0, 1);
+}
+
+.palette-title {
+    -fx-padding: 6 10 6 10;
+    -fx-alignment: center;
+    -fx-font-size: 1em;
+    -fx-background-color: -emphasize;
+}
+
+.palette-title .text {
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.6), 5, 0.0, 0, 1);
+}
+
+.list-view {
+    -fx-padding: 0;
+}
+
+.tool-bar {
+    -fx-background-color: -fx-base;
+}
+
+.menu-bar {
+    -fx-background-color: -fx-base;
+}
+
+.scroll-bar .thumb {
+    -fx-background-color: derive(-fx-base, -30%);
+    -fx-background-radius: 0;
+    -fx-border-color: derive(-fx-base, -60%);
+    -fx-border-radius: 0;
+}
+
+.element-button {
+    -fx-fill: white;
+}
+
+.palette-button {
+    -fx-fill: white;
+}
+
+.new-project-pane {
+    -fx-background-color: red;
+}
+
+.layer:pressed {
+}
+
+.presentation-wrapper {
+    -fx-padding: 20px;
+}
+
+.transparency {
+    -fx-background-image: url("transparency-tile.png");
+    -fx-background-repeat: repeat;
+}
+
+.workbench .presentation {
+}
+
+.resize-handle {
+    -fx-background-color: white;
+    -fx-border-color: black;
+    -fx-pref-width: 8;
+    -fx-pref-height: 8;
+    -fx-max-width: 8;
+    -fx-max-height: 8;
+}
+
+.resize-handle.top-left {
+    -fx-translate-x: -4;
+    -fx-translate-y: -4;
+    -fx-cursor: nw-resize;
+}
+
+.resize-handle.top-center {
+    -fx-translate-x: 0;
+    -fx-translate-y: -4;
+    -fx-cursor: n-resize;
+}
+
+.resize-handle.top-right {
+    -fx-translate-x: 4;
+    -fx-translate-y: -4;
+    -fx-cursor: ne-resize;
+}
+
+.resize-handle.center-left {
+    -fx-translate-x: -4;
+    -fx-translate-y: 0;
+    -fx-cursor: w-resize;
+}
+
+.resize-handle.center-right {
+    -fx-translate-x: 4;
+    -fx-translate-y: 0;
+    -fx-cursor: e-resize;
+}
+
+.resize-handle.bottom-left {
+    -fx-translate-x: -4;
+    -fx-translate-y: 4;
+    -fx-cursor: sw-resize;
+}
+
+.resize-handle.bottom-center {
+    -fx-translate-x: 0;
+    -fx-translate-y: 4;
+    -fx-cursor: s-resize;
+}
+
+.resize-handle.bottom-right {
+    -fx-translate-x: 4;
+    -fx-translate-y: 4;
+    -fx-cursor: se-resize;
+}
+
+.transition-line {
+    -fx-background-color: orange;
+}
+
+.current-time-indicator {
+    -fx-stroke: red;
+    -fx-stroke-width: 4px;
+    -fx-cursor: w_resize;
+}
+
+.button-bar {
+    -fx-padding: 5px;
+    -fx-spacing: 5px;
+}
+
+.play-button {
+    -fx-fill: lightgreen;
+}
+
+.pause-button {
+    -fx-fill: orange;
+}
+
+.stop-button {
+    -fx-fill: red;
+}
+
+.clear-button {
+    -fx-fill: white;
+    -fx-translate-x: -2;
+    -fx-cursor: hand;
+    -fx-font-size: 1.2em;
+}
+
+.clear-button:hover {
+    -fx-fill: red;
+}
+
+.clear-button:pressed {
+    -fx-fill: darkred;
+}
