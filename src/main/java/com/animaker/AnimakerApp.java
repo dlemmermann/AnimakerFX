@@ -45,9 +45,10 @@ public class AnimakerApp extends Application {
         Scene scene = new Scene(view);
         primaryStage.setTitle("AnimakerFX");
         primaryStage.setScene(scene);
-        primaryStage.setWidth(1760);
-        primaryStage.setHeight(990);
+        primaryStage.setWidth(1024);
+        primaryStage.setHeight(768);
         primaryStage.centerOnScreen();
+        primaryStage.setMaximized(true);
         primaryStage.show();
     }
 
